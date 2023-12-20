@@ -31,6 +31,8 @@ The Reddit Conversion API Tag allows sending conversion data from server Google 
 - User agent
 - Screen dimensions
 
+## Useful link:
+- https://stape.io/blog/reddit-conversion-api-tag-for-server-google-tag-manager 
 ## Open Source
 
 Reddit Tag for GTM Server Side is developing and maintained by [Stape Team](https://stape.io/) under the Apache 2.0 license.
