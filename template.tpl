@@ -111,8 +111,30 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "TEXT",
-    "name": "apiKey",
-    "displayName": "Reddit API Key",
+    "name": "refreshToken",
+    "displayName": "Reddit Refresh Token",
+    "simpleValueType": true,
+    "valueValidators": [
+      {
+        "type": "NON_EMPTY"
+      }
+    ]
+  },
+  {
+    "type": "TEXT",
+    "name": "clientId",
+    "displayName": "Reddit Client ID",
+    "simpleValueType": true,
+    "valueValidators": [
+      {
+        "type": "NON_EMPTY"
+      }
+    ]
+  },
+  {
+    "type": "TEXT",
+    "name": "secret",
+    "displayName": "Client Secret",
     "simpleValueType": true,
     "valueValidators": [
       {
@@ -342,6 +364,11 @@ const getTimestampMillis = require('getTimestampMillis');
 const Math = require('Math');
 const makeNumber = require('makeNumber');
 const encodeUriComponent = require('encodeUriComponent');
+const Firestore = require('Firestore');
+const Promise = require('Promise');
+const toBase64 = require('toBase64');
+
+
 
 const isLoggingEnabled = determinateIsLoggingEnabled();
 const traceId = isLoggingEnabled ? getRequestHeader('trace-id') : undefined;
@@ -366,19 +393,7 @@ const postUrl =
 let eventType = getEventType(eventData, data);
 let postBody = mapEvent(eventData, data, eventType);
 
-if (isLoggingEnabled) {
-  logToConsole(
-    JSON.stringify({
-      Name: 'Reddit',
-      Type: 'Request',
-      TraceId: traceId,
-      EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
-      RequestMethod: 'POST',
-      RequestUrl: postUrl,
-      RequestBody: postBody,
-    })
-  );
-}
+
 
 if (rdtcid) {
   setCookie('rdt_cid', rdtcid, {
@@ -391,39 +406,123 @@ if (rdtcid) {
   });
 }
 
-sendHttpRequest(
-  postUrl,
-  (statusCode, headers, body) => {
+
+
+
+Firestore.read('reddit/auth_key').then((result) => {
+  if (result.reason == "not_found") {
+    refreshKey().then(r => sendHttpRequest(r));
+  }
+  const authKey = result.data;
+  if (authKey.lastUpdated < (getTimestampMillis() - 1000 * 60 * 60)) {
+    refreshKey().then(r => sendHttpRequest(r));
+  } else {
+    sendRequest(authKey.apiKey);
+  }  
+}); 
+
+
+
+function sendRequest(authKey) {  
+  if (isLoggingEnabled) {
+    logToConsole(
+      JSON.stringify({
+      Name: 'Reddit',
+      Type: 'Request',
+      TraceId: traceId,
+      EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
+      RequestMethod: 'POST',
+      RequestUrl: postUrl,
+      RequestBody: postBody,
+      AuthKey: authKey
+      })
+    );
+  }  
+  
+  sendHttpRequest(postUrl, (statusCode, headers, body) => {
+
+      if (isLoggingEnabled) {
+        logToConsole(
+          JSON.stringify({
+            Name: 'Reddit',
+            Type: 'Response',
+            TraceId: traceId,
+            EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
+            ResponseStatusCode: statusCode,
+            ResponseHeaders: headers,
+            ResponseBody: body,
+          })
+        );
+      }
+      if (!data.useOptimisticScenario) {
+        if (statusCode >= 200 && statusCode < 400) {
+          data.gtmOnSuccess();
+        } else {
+          data.gtmOnFailure();
+        }
+      }
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + authKey 
+      },
+      method: 'POST',
+    },
+    JSON.stringify(postBody)
+    );
+}
+
+function refreshKey() {
+  return Promise.create((res, rej) => {
     if (isLoggingEnabled) {
       logToConsole(
         JSON.stringify({
-          Name: 'Reddit',
-          Type: 'Response',
-          TraceId: traceId,
-          EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
-          ResponseStatusCode: statusCode,
-          ResponseHeaders: headers,
-          ResponseBody: body,
+        Name: 'Reddit',
+        Type: 'RequestRefreshKey',
+        TraceId: traceId,
+        EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
+        RequestMethod: 'POST',
+        RequestUrl: postUrl,
+        RequestBody: postBody,        
         })
       );
-    }
-    if (!data.useOptimisticScenario) {
-      if (statusCode >= 200 && statusCode < 400) {
-        data.gtmOnSuccess();
-      } else {
-        data.gtmOnFailure();
-      }
-    }
-  },
-  {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'bearer ' + data.accessToken,
-    },
-    method: 'POST',
-  },
-  JSON.stringify(postBody)
-);
+    }  
+    
+    const baseAuth = toBase64(data.clientId + ":" + data.secret);
+    
+    const httpPromise = sendHttpRequest("https://www.reddit.com/api/v1/access_token", {
+        method: "POST",
+        headers: {
+          'User-Agent': "klutch_conversion",
+          'Authorization': 'Basic ' + baseAuth,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }, "grant_type=refresh_token&refresh_token=" + data.refreshToken);
+      
+      httpPromise.then( result => {
+        if (isLoggingEnabled) {
+          logToConsole(
+            JSON.stringify({
+              Name: 'Reddit',
+              Type: 'ResponseRefreshKey',
+              TraceId: traceId,
+              EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
+              ResponseStatusCode: result.statusCode,
+              ResponseHeaders: result.headers,
+              ResponseBody: result.body,
+            })
+          );
+        }        
+        const body = JSON.parse(result.body).access_token;
+        Firestore.write('reddit/auth_key', {apiKey: body, lastUpdated: getTimestampMillis()});
+        res(body);
+      });
+  });
+
+}
+
+
 
 function mapEvent(eventData, data, eventType) {
   let mappedData = {
@@ -585,6 +684,11 @@ function getEventType(eventData, data) {
 
     return {
       tracking_type: gaToEventName[eventName]
+    };
+  }
+  if (data.eventNameCustom == 'Purchase' || data.eventNameCustom == 'SignUp') {
+    return {
+        tracking_type: data.eventNameCustom,
     };
   }
 
@@ -887,6 +991,63 @@ ___SERVER_PERMISSIONS___
               {
                 "type": 1,
                 "string": "https://ads-api.reddit.com/"
+              },
+              {
+                "type": 1,
+                "string": "https://www.reddit.com/api/v1/access_token"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "access_firestore",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "allowedOptions",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "projectId"
+                  },
+                  {
+                    "type": 1,
+                    "string": "path"
+                  },
+                  {
+                    "type": 1,
+                    "string": "operation"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "GOOGLE_CLOUD_PROJECT"
+                  },
+                  {
+                    "type": 1,
+                    "string": "reddit/auth_key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read_write"
+                  }
+                ]
               }
             ]
           }
