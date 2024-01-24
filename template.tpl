@@ -714,6 +714,11 @@ function getEventType(eventData, data) {
       tracking_type: gaToEventName[eventName]
     };
   }
+  if (data.eventNameCustom == 'Purchase' || data.eventNameCustom == 'SignUp') {
+    return {
+        tracking_type: data.eventNameCustom,
+            };
+  }
 
   if (data.eventType === 'custom') {
     return {
