@@ -343,6 +343,33 @@ ___TEMPLATE_PARAMETERS___
         "defaultValue": "debug"
       }
     ]
+  },
+  {
+    "type": "GROUP",
+    "name": "firebaseGroup",
+    "displayName": "Firebase Settings",
+    "groupStyle": "ZIPPY_CLOSED",
+    "subParams": [
+      {
+        "type": "TEXT",
+        "name": "firebaseProjectId",
+        "displayName": "Firebase Project ID",
+        "simpleValueType": true
+      },
+      {
+        "type": "TEXT",
+        "name": "firebasePath",
+        "displayName": "Firebase Path",
+        "simpleValueType": true,
+        "help": "The tag uses Firebase to store the OAuth access token. You can choose any key for a document that will store the OAuth access token.",
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          }
+        ],
+        "defaultValue": "stape/reddit-offline-auth"
+      }
+    ]
   }
 ]
 
@@ -394,6 +421,8 @@ let eventType = getEventType(eventData, data);
 let postBody = mapEvent(eventData, data, eventType);
 
 
+let firebaseOptions = {};
+if (data.firebaseProjectId) firebaseOptions.projectId = data.firebaseProjectId;
 
 if (rdtcid) {
   setCookie('rdt_cid', rdtcid, {
@@ -404,22 +433,22 @@ if (rdtcid) {
     'max-age': 2592000, // 30 days
     httpOnly: false,
   });
-}
+}  
 
 
 
 
-Firestore.read('reddit/auth_key').then((result) => {
+Firestore.read(data.firebasePath, firebaseOptions).then((result) => {
   if (result.reason == "not_found") {
-    refreshKey().then(r => sendHttpRequest(r));
+    refreshKey().then(r => sendRequest(r));
   }
   const authKey = result.data;
   if (authKey.lastUpdated < (getTimestampMillis() - 1000 * 60 * 60)) {
-    refreshKey().then(r => sendHttpRequest(r));
+    refreshKey().then(r => sendRequest(r));
   } else {
     sendRequest(authKey.apiKey);
   }  
-}); 
+}, () => refreshKey().then(r => sendRequest(r))); 
 
 
 
@@ -434,7 +463,6 @@ function sendRequest(authKey) {
       RequestMethod: 'POST',
       RequestUrl: postUrl,
       RequestBody: postBody,
-      AuthKey: authKey
       })
     );
   }  
@@ -479,7 +507,7 @@ function refreshKey() {
       logToConsole(
         JSON.stringify({
         Name: 'Reddit',
-        Type: 'RequestRefreshKey',
+        Type: 'Request',
         TraceId: traceId,
         EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
         RequestMethod: 'POST',
@@ -505,7 +533,7 @@ function refreshKey() {
           logToConsole(
             JSON.stringify({
               Name: 'Reddit',
-              Type: 'ResponseRefreshKey',
+              Type: 'Response',
               TraceId: traceId,
               EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
               ResponseStatusCode: result.statusCode,
@@ -515,7 +543,7 @@ function refreshKey() {
           );
         }        
         const body = JSON.parse(result.body).access_token;
-        Firestore.write('reddit/auth_key', {apiKey: body, lastUpdated: getTimestampMillis()});
+        Firestore.write(data.firebasePath,  {apiKey: body, lastUpdated: getTimestampMillis()}, firebaseOptions);
         res(body);
       });
   });
@@ -689,7 +717,7 @@ function getEventType(eventData, data) {
   if (data.eventNameCustom == 'Purchase' || data.eventNameCustom == 'SignUp') {
     return {
         tracking_type: data.eventNameCustom,
-    };
+            };
   }
 
   if (data.eventType === 'custom') {
@@ -1037,11 +1065,11 @@ ___SERVER_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
-                    "string": "GOOGLE_CLOUD_PROJECT"
+                    "string": "*"
                   },
                   {
                     "type": 1,
-                    "string": "reddit/auth_key"
+                    "string": "*"
                   },
                   {
                     "type": 1,
