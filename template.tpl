@@ -441,6 +441,7 @@ if (rdtcid) {
 Firestore.read(data.firebasePath, firebaseOptions).then((result) => {
   if (result.reason == "not_found") {
     refreshKey().then(r => sendRequest(r));
+    return
   }
   const authKey = result.data;
   if (authKey.lastUpdated < (getTimestampMillis() - 1000 * 60 * 60)) {
@@ -506,7 +507,7 @@ function refreshKey() {
     if (isLoggingEnabled) {
       logToConsole(
         JSON.stringify({
-        Name: 'Reddit',
+        Name: 'RefreshKey',
         Type: 'Request',
         TraceId: traceId,
         EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
@@ -532,7 +533,7 @@ function refreshKey() {
         if (isLoggingEnabled) {
           logToConsole(
             JSON.stringify({
-              Name: 'Reddit',
+              Name: 'RefreshKey',
               Type: 'Response',
               TraceId: traceId,
               EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
