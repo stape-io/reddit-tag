@@ -1,4 +1,6 @@
 homepage: 'https://stape.io/'
 versions:
+  - sha: ff1c1de7a5dd1cda081d1260b83dab9ab5b16b37
+    changeNotes: Added Oauth2 support.
   - sha: c26b1347c4af4ada6698f7e29444e8161083e7d8
     changeNotes: Initial release.
