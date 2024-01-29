@@ -13,6 +13,11 @@ const getTimestampMillis = require('getTimestampMillis');
 const Math = require('Math');
 const makeNumber = require('makeNumber');
 const encodeUriComponent = require('encodeUriComponent');
+const Firestore = require('Firestore');
+const Promise = require('Promise');
+const toBase64 = require('toBase64');
+
+
 
 const isLoggingEnabled = determinateIsLoggingEnabled();
 const traceId = isLoggingEnabled ? getRequestHeader('trace-id') : undefined;
@@ -37,19 +42,9 @@ const postUrl =
 let eventType = getEventType(eventData, data);
 let postBody = mapEvent(eventData, data, eventType);
 
-if (isLoggingEnabled) {
-  logToConsole(
-    JSON.stringify({
-      Name: 'Reddit',
-      Type: 'Request',
-      TraceId: traceId,
-      EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
-      RequestMethod: 'POST',
-      RequestUrl: postUrl,
-      RequestBody: postBody,
-    })
-  );
-}
+
+let firebaseOptions = {};
+if (data.firebaseProjectId) firebaseOptions.projectId = data.firebaseProjectId;
 
 if (rdtcid) {
   setCookie('rdt_cid', rdtcid, {
@@ -62,39 +57,123 @@ if (rdtcid) {
   });
 }
 
-sendHttpRequest(
-  postUrl,
-  (statusCode, headers, body) => {
+
+
+
+Firestore.read(data.firebasePath, firebaseOptions).then((result) => {
+  if (result.reason == "not_found") {
+    refreshKey().then(r => sendRequest(r));
+    return;
+  }
+  const authKey = result.data;
+  if (authKey.lastUpdated < (getTimestampMillis() - 1000 * 60 * 60)) {
+    refreshKey().then(r => sendRequest(r));
+  } else {
+    sendRequest(authKey.apiKey);
+  }
+}, () => refreshKey().then(r => sendRequest(r)));
+
+
+
+function sendRequest(authKey) {
+  if (isLoggingEnabled) {
+    logToConsole(
+      JSON.stringify({
+        Name: 'Reddit',
+        Type: 'Request',
+        TraceId: traceId,
+        EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
+        RequestMethod: 'POST',
+        RequestUrl: postUrl,
+        RequestBody: postBody,
+      })
+    );
+  }
+
+  sendHttpRequest(postUrl, (statusCode, headers, body) => {
+
+      if (isLoggingEnabled) {
+        logToConsole(
+          JSON.stringify({
+            Name: 'Reddit',
+            Type: 'Response',
+            TraceId: traceId,
+            EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
+            ResponseStatusCode: statusCode,
+            ResponseHeaders: headers,
+            ResponseBody: body,
+          })
+        );
+      }
+      if (!data.useOptimisticScenario) {
+        if (statusCode >= 200 && statusCode < 400) {
+          data.gtmOnSuccess();
+        } else {
+          data.gtmOnFailure();
+        }
+      }
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + authKey
+      },
+      method: 'POST',
+    },
+    JSON.stringify(postBody)
+  );
+}
+
+function refreshKey() {
+  return Promise.create((res, rej) => {
     if (isLoggingEnabled) {
       logToConsole(
         JSON.stringify({
-          Name: 'Reddit',
-          Type: 'Response',
+          Name: 'RefreshKey',
+          Type: 'Request',
           TraceId: traceId,
           EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
-          ResponseStatusCode: statusCode,
-          ResponseHeaders: headers,
-          ResponseBody: body,
+          RequestMethod: 'POST',
+          RequestUrl: postUrl,
+          RequestBody: postBody,
         })
       );
     }
-    if (!data.useOptimisticScenario) {
-      if (statusCode >= 200 && statusCode < 400) {
-        data.gtmOnSuccess();
-      } else {
-        data.gtmOnFailure();
+
+    const baseAuth = toBase64(data.clientId + ":" + data.secret);
+
+    const httpPromise = sendHttpRequest("https://www.reddit.com/api/v1/access_token", {
+      method: "POST",
+      headers: {
+        'User-Agent': "klutch_conversion",
+        'Authorization': 'Basic ' + baseAuth,
+        'Content-Type': 'application/x-www-form-urlencoded'
       }
-    }
-  },
-  {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'bearer ' + data.accessToken,
-    },
-    method: 'POST',
-  },
-  JSON.stringify(postBody)
-);
+    }, "grant_type=refresh_token&refresh_token=" + data.refreshToken);
+
+    httpPromise.then( result => {
+      if (isLoggingEnabled) {
+        logToConsole(
+          JSON.stringify({
+            Name: 'RefreshKey',
+            Type: 'Response',
+            TraceId: traceId,
+            EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
+            ResponseStatusCode: result.statusCode,
+            ResponseHeaders: result.headers,
+            ResponseBody: result.body,
+          })
+        );
+      }
+      const body = JSON.parse(result.body).access_token;
+      Firestore.write(data.firebasePath,  {apiKey: body, lastUpdated: getTimestampMillis()}, firebaseOptions);
+      res(body);
+    });
+  });
+
+}
+
+
 
 function mapEvent(eventData, data, eventType) {
   let mappedData = {
@@ -256,6 +335,11 @@ function getEventType(eventData, data) {
 
     return {
       tracking_type: gaToEventName[eventName]
+    };
+  }
+  if (data.eventNameCustom == 'Purchase' || data.eventNameCustom == 'SignUp') {
+    return {
+      tracking_type: data.eventNameCustom,
     };
   }
 

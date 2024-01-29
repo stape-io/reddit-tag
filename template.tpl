@@ -441,7 +441,7 @@ if (rdtcid) {
 Firestore.read(data.firebasePath, firebaseOptions).then((result) => {
   if (result.reason == "not_found") {
     refreshKey().then(r => sendRequest(r));
-    return
+    return;
   }
   const authKey = result.data;
   if (authKey.lastUpdated < (getTimestampMillis() - 1000 * 60 * 60)) {
