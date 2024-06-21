@@ -12,21 +12,33 @@ const getType = require('getType');
 const getTimestampMillis = require('getTimestampMillis');
 const Math = require('Math');
 const makeNumber = require('makeNumber');
+const makeString = require('makeString');
 const encodeUriComponent = require('encodeUriComponent');
-const Firestore = require('Firestore');
-const Promise = require('Promise');
-const toBase64 = require('toBase64');
-
-
 
 const isLoggingEnabled = determinateIsLoggingEnabled();
 const traceId = isLoggingEnabled ? getRequestHeader('trace-id') : undefined;
 
 const eventData = getAllEventData();
+
+const apiVersion = '2.0';
+const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/conversions/events/' + enc(data.accountId);
+const eventType = getEventType(eventData, data);
+const eventName = eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type;
+const postBody = mapEvent(eventData, data);
 const url = eventData.page_location || getRequestHeader('referer');
 
-let rdtcid = getCookieValues('rdt_cid')[0];
-if (!rdtcid) rdtcid = eventData.rdt_cid;
+const deprecatedCookie = getCookieValues('rdt_cid')[0];
+if (deprecatedCookie) {
+  setCookie('rdt_cid', '', {
+    domain: 'auto',
+    path: '/',
+    samesite: 'Lax',
+    secure: true,
+    'max-age': 0,
+    httpOnly: false
+  });
+}
+let rdtcid = deprecatedCookie || getCookieValues('_rdt_cid')[0] || eventData.rdt_cid;
 
 if (url) {
   const urlParsed = parseUrl(url);
@@ -36,149 +48,73 @@ if (url) {
   }
 }
 
-const apiVersion = '2.0';
-const postUrl =
-  'https://ads-api.reddit.com/api/v' + apiVersion + '/conversions/events/' + enc(data.accountId);
-let eventType = getEventType(eventData, data);
-let postBody = mapEvent(eventData, data, eventType);
-
-
-let firebaseOptions = {};
-if (data.firebaseProjectId) firebaseOptions.projectId = data.firebaseProjectId;
-
 if (rdtcid) {
-  setCookie('rdt_cid', rdtcid, {
+  setCookie('_rdt_cid', rdtcid, {
     domain: 'auto',
     path: '/',
     samesite: 'Lax',
     secure: true,
     'max-age': 2592000, // 30 days
-    httpOnly: false,
+    httpOnly: false
   });
 }
 
-
-
-
-Firestore.read(data.firebasePath, firebaseOptions).then((result) => {
-  if (result.reason == "not_found") {
-    refreshKey().then(r => sendRequest(r));
-    return;
-  }
-  const authKey = result.data;
-  if (authKey.lastUpdated < (getTimestampMillis() - 1000 * 60 * 60)) {
-    refreshKey().then(r => sendRequest(r));
-  } else {
-    sendRequest(authKey.apiKey);
-  }
-}, () => refreshKey().then(r => sendRequest(r)));
-
-
-
-function sendRequest(authKey) {
-  if (isLoggingEnabled) {
-    logToConsole(
-      JSON.stringify({
-        Name: 'Reddit',
-        Type: 'Request',
-        TraceId: traceId,
-        EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
-        RequestMethod: 'POST',
-        RequestUrl: postUrl,
-        RequestBody: postBody,
-      })
-    );
-  }
-
-  sendHttpRequest(postUrl, (statusCode, headers, body) => {
-
-      if (isLoggingEnabled) {
-        logToConsole(
-          JSON.stringify({
-            Name: 'Reddit',
-            Type: 'Response',
-            TraceId: traceId,
-            EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
-            ResponseStatusCode: statusCode,
-            ResponseHeaders: headers,
-            ResponseBody: body,
-          })
-        );
-      }
-      if (!data.useOptimisticScenario) {
-        if (statusCode >= 200 && statusCode < 400) {
-          data.gtmOnSuccess();
-        } else {
-          data.gtmOnFailure();
-        }
-      }
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer " + authKey
-      },
-      method: 'POST',
-    },
-    JSON.stringify(postBody)
+if (isLoggingEnabled) {
+  logToConsole(
+    JSON.stringify({
+      Name: 'Reddit',
+      Type: 'Request',
+      TraceId: traceId,
+      EventName: eventName,
+      RequestMethod: 'POST',
+      RequestUrl: postUrl,
+      RequestBody: postBody
+    })
   );
 }
 
-function refreshKey() {
-  return Promise.create((res, rej) => {
+sendHttpRequest(
+  postUrl,
+  (statusCode, headers, body) => {
     if (isLoggingEnabled) {
       logToConsole(
         JSON.stringify({
-          Name: 'RefreshKey',
-          Type: 'Request',
+          Name: 'Reddit',
+          Type: 'Response',
           TraceId: traceId,
-          EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
-          RequestMethod: 'POST',
-          RequestUrl: postUrl,
-          RequestBody: postBody,
+          EventName: eventName,
+          ResponseStatusCode: statusCode,
+          ResponseHeaders: headers,
+          ResponseBody: body
         })
       );
     }
-
-    const baseAuth = toBase64(data.clientId + ":" + data.secret);
-
-    const httpPromise = sendHttpRequest("https://www.reddit.com/api/v1/access_token", {
-      method: "POST",
-      headers: {
-        'User-Agent': "klutch_conversion",
-        'Authorization': 'Basic ' + baseAuth,
-        'Content-Type': 'application/x-www-form-urlencoded'
+    if (!data.useOptimisticScenario) {
+      if (statusCode >= 200 && statusCode < 400) {
+        data.gtmOnSuccess();
+      } else {
+        data.gtmOnFailure();
       }
-    }, "grant_type=refresh_token&refresh_token=" + data.refreshToken);
+    }
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + data.accessToken
+    },
+    method: 'POST'
+  },
+  JSON.stringify(postBody)
+);
 
-    httpPromise.then( result => {
-      if (isLoggingEnabled) {
-        logToConsole(
-          JSON.stringify({
-            Name: 'RefreshKey',
-            Type: 'Response',
-            TraceId: traceId,
-            EventName: eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type,
-            ResponseStatusCode: result.statusCode,
-            ResponseHeaders: result.headers,
-            ResponseBody: result.body,
-          })
-        );
-      }
-      const body = JSON.parse(result.body).access_token;
-      Firestore.write(data.firebasePath,  {apiKey: body, lastUpdated: getTimestampMillis()}, firebaseOptions);
-      res(body);
-    });
-  });
-
+if (data.useOptimisticScenario) {
+  data.gtmOnSuccess();
 }
 
-
-
-function mapEvent(eventData, data, eventType) {
+function mapEvent(eventData, data) {
   let mappedData = {
     event_type: eventType,
-    event_at: data.eventAt ? data.eventAt : Math.round(getTimestampMillis() / 1000),
+    event_at: data.eventAt ? data.eventAt : Math.round(getTimestampMillis() / 1000)
   };
 
   if (data.clickId) {
@@ -192,7 +128,7 @@ function mapEvent(eventData, data, eventType) {
 
   return {
     events: [mappedData],
-    test_mode: data.testMode,
+    test_mode: data.testMode
   };
 }
 
@@ -208,7 +144,6 @@ function addPropertiesData(eventData, mappedData) {
   if (eventData.value) mappedData.event_metadata.value_decimal = makeNumber(eventData.value);
   else if (eventData['x-ga-mp1-ev']) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-ev']);
   else if (eventData['x-ga-mp1-tr']) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-tr']);
-
 
   if (eventData.products) mappedData.event_metadata.products = eventData.products;
   else if (eventData.items && eventData.items[0]) {
@@ -246,7 +181,8 @@ function addUserData(eventData, mappedData) {
   if (getType(eventData.user_data) === 'object') {
     userEventData = eventData.user_data || eventData.user_properties || eventData.user;
   }
-
+  const uuid = getUUIDFromCookie() || eventData.rdt_uuid;
+  if (uuid) mappedData.user.uuid = uuid;
   if (eventData.aaid) mappedData.user.aaid = eventData.aaid;
   else if (userEventData.aaid) mappedData.user.aaid = userEventData.aaid;
 
@@ -254,16 +190,15 @@ function addUserData(eventData, mappedData) {
   else if (eventData.email_address) mappedData.user.email = eventData.email_address;
   else if (userEventData.email) mappedData.user.email = userEventData.email;
   else if (userEventData.email_address) mappedData.user.email = userEventData.email_address;
+  else if (getCookieValues('_rdt_em')[0]) mappedData.user.email = getCookieValues('_rdt_em')[0];
 
   if (eventData.external_id) mappedData.user.external_id = eventData.external_id;
   else if (eventData.user_id) mappedData.user.external_id = eventData.user_id;
   else if (eventData.userId) mappedData.user.external_id = eventData.userId;
   else if (userEventData.external_id) mappedData.user.external_id = userEventData.external_id;
 
-
   if (eventData.idfa) mappedData.user.idfa = eventData.idfa;
   else if (userEventData.idfa) mappedData.user.idfa = userEventData.idfa;
-
 
   if (eventData.ip_override) mappedData.user.ip_address = eventData.ip_override;
   else if (eventData.ip_address) mappedData.user.ip_address = eventData.ip_address;
@@ -291,6 +226,29 @@ function addUserData(eventData, mappedData) {
   }
 
   return mappedData;
+}
+
+function getUUIDFromCookie() {
+  const uuidsWithTimestamps = getCookieValues('_rdt_uuid');
+  if (!uuidsWithTimestamps || !uuidsWithTimestamps.length) return null;
+  let oldest = null;
+  for (let i = 0; i < uuidsWithTimestamps.length; i++) {
+    const current = getUUIDAndTimestamp(uuidsWithTimestamps[i]);
+    if (!current) continue;
+    if (!oldest || current.timestamp < oldest.timestamp) oldest = current;
+  }
+  return oldest && oldest.uuid;
+}
+
+function getUUIDAndTimestamp(uuidWithTimestamp) {
+  if (!uuidWithTimestamp) return null;
+  const parts = uuidWithTimestamp.split('.');
+  if (parts.length !== 2) return null;
+
+  return {
+    timestamp: makeNumber(parts[0]),
+    uuid: makeString(parts[1])
+  };
 }
 
 function getEventType(eventData, data) {
@@ -323,13 +281,13 @@ function getEventType(eventData, data) {
       'gtm4wp.productClickEEC': 'ViewContent',
       'gtm4wp.checkoutOptionEEC': 'Lead',
       'gtm4wp.checkoutStepEEC': 'Lead',
-      'gtm4wp.orderCompletedEEC': 'Purchase',
+      'gtm4wp.orderCompletedEEC': 'Purchase'
     };
 
     if (!gaToEventName[eventName]) {
       return {
         tracking_type: 'Custom',
-        custom_event_name: eventName,
+        custom_event_name: eventName
       };
     }
 
@@ -339,28 +297,25 @@ function getEventType(eventData, data) {
   }
   if (data.eventNameCustom == 'Purchase' || data.eventNameCustom == 'SignUp') {
     return {
-      tracking_type: data.eventNameCustom,
+      tracking_type: data.eventNameCustom
     };
   }
 
   if (data.eventType === 'custom') {
     return {
       tracking_type: 'Custom',
-      custom_event_name: data.eventNameCustom,
+      custom_event_name: data.eventNameCustom
     };
   }
 
   return {
-    tracking_type: data.eventName,
+    tracking_type: data.eventName
   };
 }
 
 function determinateIsLoggingEnabled() {
   const containerVersion = getContainerVersion();
-  const isDebug = !!(
-    containerVersion &&
-    (containerVersion.debugMode || containerVersion.previewMode)
-  );
+  const isDebug = !!(containerVersion && (containerVersion.debugMode || containerVersion.previewMode));
 
   if (!data.logType) {
     return isDebug;
