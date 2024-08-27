@@ -448,7 +448,7 @@ if (data.useOptimisticScenario) {
 function mapEvent(eventData, data) {
   let mappedData = {
     event_type: eventType,
-    event_at: data.eventAt ? data.eventAt : Math.round(getTimestampMillis() / 1000)
+    event_at: data.eventAt ? data.eventAt : convertToRFC3339UsingMath(getTimestampMillis())
   };
 
   if (data.clickId) {
@@ -671,6 +671,70 @@ function enc(data) {
   return encodeUriComponent(data);
 }
 
+function convertToRFC3339UsingMath(milliseconds) {
+    // Constants
+    const msPerSecond = 1000;
+    const msPerMinute = 60 * msPerSecond;
+    const msPerHour = 60 * msPerMinute;
+    const msPerDay = 24 * msPerHour;
+
+    // Calculate the number of days since epoch
+    let daysSinceEpoch = Math.floor(milliseconds / msPerDay);
+
+    // Calculate the number of milliseconds remaining after the full days are accounted for
+    let remainingMilliseconds = milliseconds % msPerDay;
+
+    // Calculate the UTC hours, minutes, seconds, and milliseconds
+    let hours = Math.floor(remainingMilliseconds / msPerHour);
+    remainingMilliseconds = remainingMilliseconds % msPerHour;
+
+    let minutes = Math.floor(remainingMilliseconds / msPerMinute);
+    remainingMilliseconds = remainingMilliseconds % msPerMinute;
+
+    let seconds = Math.floor(remainingMilliseconds / msPerSecond);
+
+    // Calculate the date (year, month, day) from the number of days since epoch
+    let year = 1970;
+    let month = 1;
+
+    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    while (daysSinceEpoch >= 365) {
+        if (isLeapYear(year)) {
+            if (daysSinceEpoch >= 366) {
+                daysSinceEpoch = daysSinceEpoch - 366;
+                year++;
+            }
+        } else {
+            daysSinceEpoch = daysSinceEpoch - 365;
+            year++;
+        }
+    }
+
+    while (daysSinceEpoch >= daysInMonth[month - 1]) {
+        if (month === 2 && isLeapYear(year) && daysSinceEpoch >= 29) {
+            daysSinceEpoch = daysSinceEpoch - 29;
+        } else {
+            daysSinceEpoch = daysSinceEpoch - daysInMonth[month - 1];
+        }
+        month++;
+    }
+
+    let day = daysSinceEpoch + 1;
+
+    // Helper function to check if a year is a leap year
+    function isLeapYear(year) {
+        return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    }
+
+    // Format components to ensure two digits where needed
+    const pad = (n) => n < 10 ? '0' + n : n;
+
+    // Construct the RFC 3339 timestamp
+    const rfc3339Timestamp = year + '-' + pad(month) + '-' + pad(day) + 'T' + pad(hours) + ':' + pad(minutes) + ':' + pad(seconds) + 'Z';
+
+    return rfc3339Timestamp;
+}
 
 ___SERVER_PERMISSIONS___
 
