@@ -344,7 +344,6 @@ const parseUrl = require('parseUrl');
 const decodeUriComponent = require('decodeUriComponent');
 const getType = require('getType');
 const getTimestampMillis = require('getTimestampMillis');
-const Math = require('Math');
 const makeNumber = require('makeNumber');
 const makeString = require('makeString');
 const encodeUriComponent = require('encodeUriComponent');
@@ -447,9 +446,14 @@ if (data.useOptimisticScenario) {
 
 function mapEvent(eventData, data) {
   let mappedData = {
-    event_type: eventType,
-    event_at: data.eventAt ? data.eventAt : Math.round(getTimestampMillis() / 1000)
+    event_type: eventType
   };
+
+  if (data.eventAt) {
+    mappedData.event_at = data.eventAt;
+  } else {
+    mappedData.event_at_ms = getTimestampMillis();
+  }
 
   if (data.clickId) {
     mappedData.click_id = data.clickId;
