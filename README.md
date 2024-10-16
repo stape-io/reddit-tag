@@ -7,6 +7,8 @@ The Reddit Conversion API Tag allows conversion data to be sent from the Google 
 
 ## Tag settings
 
+![Reddit tag image](reddit_tag.png)
+
 **Event Name Setup Method** - select from a list of standard events, add a custom event, or choose to Inherit an event name from a client. When Inherit from a client is selected, the Reddit CAPI tag will try to map events automatically into standard events or use a custom name if it’s impossible to map into a starred event.
 
 **Account ID** - ID of the Reddit Ads account to which the conversion event belongs.
