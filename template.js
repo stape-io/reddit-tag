@@ -12,6 +12,7 @@ const getType = require('getType');
 const getTimestampMillis = require('getTimestampMillis');
 const makeNumber = require('makeNumber');
 const makeString = require('makeString');
+const makeInteger = require('makeInteger');
 const encodeUriComponent = require('encodeUriComponent');
 
 const isLoggingEnabled = determinateIsLoggingEnabled();
@@ -213,13 +214,13 @@ function addUserData(eventData, mappedData) {
 
   if (eventData.viewport_size && eventData.viewport_size.split('x').length === 2) {
     mappedData.user.screen_dimensions = {
-      width: eventData.viewport_size.split('x')[0],
-      height: eventData.viewport_size.split('x')[1]
+      width: makeInteger(eventData.viewport_size.split('x')[0]),
+      height: makeInteger(eventData.viewport_size.split('x')[1])
     };
   } else if (eventData.height && eventData.width) {
     mappedData.user.screen_dimensions = {
-      height: eventData.height,
-      width: eventData.width
+      height: makeInteger(eventData.height),
+      width: makeInteger(eventData.width)
     };
   }
 
