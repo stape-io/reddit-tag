@@ -208,11 +208,11 @@ ___TEMPLATE_PARAMETERS___
               },
               {
                 "value": "value",
-                "displayValue": "Value"
+                "displayValue": "Value (Integer - The value of the transaction in the smallest subunit of the currency. For example, pennies, cents, centavos, paise etc.)"
               },
               {
                 "value": "value_decimal",
-                "displayValue": "Value Decimal"
+                "displayValue": "Value Decimal (Float - The value of the transaction in the base unit of the currency. For example, dollars, euros, pesos, rupees etc.)"
               }
             ]
           },
@@ -346,18 +346,16 @@ const getType = require('getType');
 const getTimestampMillis = require('getTimestampMillis');
 const makeNumber = require('makeNumber');
 const makeString = require('makeString');
+const makeInteger = require('makeInteger');
 const encodeUriComponent = require('encodeUriComponent');
+
+/**********************************************************************************************/
 
 const isLoggingEnabled = determinateIsLoggingEnabled();
 const traceId = isLoggingEnabled ? getRequestHeader('trace-id') : undefined;
 
 const eventData = getAllEventData();
 
-const apiVersion = '2.0';
-const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/conversions/events/' + enc(data.accountId);
-const eventType = getEventType(eventData, data);
-const eventName = eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type;
-const postBody = mapEvent(eventData, data);
 const url = eventData.page_location || getRequestHeader('referer');
 
 const deprecatedCookie = getCookieValues('rdt_cid')[0];
@@ -391,6 +389,13 @@ if (rdtcid) {
     httpOnly: false
   });
 }
+
+const apiVersion = '2.0';
+const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/conversions/events/' + enc(data.accountId);
+
+const eventType = getEventType(eventData, data);
+const eventName = eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type;
+const postBody = mapEvent(eventData, data);
 
 if (isLoggingEnabled) {
   logToConsole(
@@ -444,6 +449,9 @@ if (data.useOptimisticScenario) {
   data.gtmOnSuccess();
 }
 
+/**********************************************************************************************/
+// Vendor related functions
+
 function mapEvent(eventData, data) {
   let mappedData = {
     event_type: eventType
@@ -473,8 +481,8 @@ function mapEvent(eventData, data) {
 function addPropertiesData(eventData, mappedData) {
   mappedData.event_metadata = {};
 
-  if (eventData.event_id) mappedData.event_metadata.conversion_id = eventData.event_id;
-  else if (eventData.transaction_id) mappedData.event_metadata.conversion_id = eventData.transaction_id;
+  if (eventData.event_id) mappedData.event_metadata.conversion_id = makeString(eventData.event_id);
+  else if (eventData.transaction_id) mappedData.event_metadata.conversion_id = makeString(eventData.transaction_id);
 
   if (eventData.currency) mappedData.event_metadata.currency = eventData.currency;
   if (eventData.item_count) mappedData.event_metadata.item_count = eventData.item_count;
@@ -490,8 +498,8 @@ function addPropertiesData(eventData, mappedData) {
     eventData.items.forEach((d, i) => {
       let item = {};
 
-      if (d.item_id) item.id = d.item_id;
-      else if (d.id) item.id = d.id;
+      if (d.item_id) item.id = makeString(d.item_id);
+      else if (d.id) item.id = makeString(d.id);
 
       if (d.content_category) item.category = d.content_category;
       else if (d.category) item.category = d.category;
@@ -505,7 +513,16 @@ function addPropertiesData(eventData, mappedData) {
 
   if (data.serverEventDataList) {
     data.serverEventDataList.forEach((d) => {
-      mappedData.event_metadata[d.name] = d.value;
+      let value = d.value;
+      switch (d.name) {
+        case 'value_decimal':
+          value = makeNumber(value);
+          break;
+        case 'value':
+          value = makeInteger(value);
+          break;
+      }
+      mappedData.event_metadata[d.name] = value;
     });
   }
 
@@ -547,13 +564,13 @@ function addUserData(eventData, mappedData) {
 
   if (eventData.viewport_size && eventData.viewport_size.split('x').length === 2) {
     mappedData.user.screen_dimensions = {
-      width: eventData.viewport_size.split('x')[0],
-      height: eventData.viewport_size.split('x')[1]
+      width: makeInteger(eventData.viewport_size.split('x')[0]),
+      height: makeInteger(eventData.viewport_size.split('x')[1])
     };
   } else if (eventData.height && eventData.width) {
     mappedData.user.screen_dimensions = {
-      height: eventData.height,
-      width: eventData.width
+      height: makeInteger(eventData.height),
+      width: makeInteger(eventData.width)
     };
   }
 
@@ -651,6 +668,9 @@ function getEventType(eventData, data) {
   };
 }
 
+/**********************************************************************************************/
+// Helpers
+
 function determinateIsLoggingEnabled() {
   const containerVersion = getContainerVersion();
   const isDebug = !!(containerVersion && (containerVersion.debugMode || containerVersion.previewMode));
@@ -671,8 +691,7 @@ function determinateIsLoggingEnabled() {
 }
 
 function enc(data) {
-  data = data || '';
-  return encodeUriComponent(data);
+  return encodeUriComponent(data || '');
 }
 
 
@@ -1014,11 +1033,142 @@ ___SERVER_PERMISSIONS___
 
 ___TESTS___
 
-scenarios: []
+scenarios:
+- name: Click ID cookie is successfully retrieved from deprecated cookie and sent
+    in the request payload
+  code: "const expectedEventAt = 1746467516146;\nmockData.eventAt = expectedEventAt;\n\
+    mockData.eventType = 'standard';\nconst expectedEventName = 'PageVisit';\nmockData.eventName\
+    \ = expectedEventName;\n\nconst expectedRequestUrl = 'https://ads-api.reddit.com/api/v2.0/conversions/events/'\
+    \ + expectedAccountId;\nconst expectedRequestOptions = {\n  headers: {\n    'Content-Type':\
+    \ 'application/json',\n    Authorization: 'Bearer ' + expectedAccessToken\n  },\n\
+    \  method: 'POST'\n};\n  \nconst expectedClickId = 'expectedClickIdDeprecatedCookie';\n\
+    mock('getCookieValues', (cookieName) => {\n  if (cookieName === 'rdt_cid') return\
+    \ [expectedClickId];\n  return [];\n});\n\nmock('sendHttpRequest', (requestUrl,\
+    \ callback, requestOptions, requestBody) => {\n  const requestBodyParsed = JSON.parse(requestBody);\n\
+    \  assertThat(requestUrl).isEqualTo(expectedRequestUrl);\n  assertThat(callback).isFunction();\n\
+    \  assertThat(requestOptions).isEqualTo(expectedRequestOptions);\n  assertThat(requestBodyParsed).isEqualTo({\n\
+    \    events: [\n      {\n        event_type: { tracking_type: expectedEventName\
+    \ },\n        event_at: expectedEventAt,\n        click_id: expectedClickId,\n\
+    \        user: {},\n        event_metadata: {}\n      }\n    ]\n  });\n  \n  callback(200);\n\
+    });\n\nrunCode(mockData);\n\nassertApi('gtmOnSuccess').wasCalled();\nassertApi('gtmOnFailure').wasNotCalled();"
+- name: Click ID cookie is successfully retrieved from new cookie and sent in the
+    request payload
+  code: "const expectedEventAt = 1746467516146;\nmockData.eventAt = expectedEventAt;\n\
+    mockData.eventType = 'standard';\nconst expectedEventName = 'PageVisit';\nmockData.eventName\
+    \ = expectedEventName;\n\nconst expectedRequestUrl = 'https://ads-api.reddit.com/api/v2.0/conversions/events/'\
+    \ + expectedAccountId;\nconst expectedRequestOptions = {\n  headers: {\n    'Content-Type':\
+    \ 'application/json',\n    Authorization: 'Bearer ' + expectedAccessToken\n  },\n\
+    \  method: 'POST'\n};\n\n\nconst expectedClickId = 'expectedClickIdNewCookie';\n\
+    mock('getCookieValues', (cookieName) => {\n  if (cookieName === '_rdt_cid') return\
+    \ [expectedClickId];\n  return [];\n});\n\nmock('sendHttpRequest', (requestUrl,\
+    \ callback, requestOptions, requestBody) => {\n  const requestBodyParsed = JSON.parse(requestBody);\n\
+    \  assertThat(requestUrl).isEqualTo(expectedRequestUrl);\n  assertThat(callback).isFunction();\n\
+    \  assertThat(requestOptions).isEqualTo(expectedRequestOptions);\n  assertThat(requestBodyParsed).isEqualTo({\n\
+    \    events: [\n      {\n        event_type: { tracking_type: expectedEventName\
+    \ },\n        event_at: expectedEventAt,\n        click_id: expectedClickId,\n\
+    \        user: {},\n        event_metadata: {}\n      }\n    ]\n  });\n  \n  callback(200);\n\
+    });\n\nrunCode(mockData);\n\nassertApi('gtmOnSuccess').wasCalled();\nassertApi('gtmOnFailure').wasNotCalled();"
+- name: Click ID cookie is successfully retrieved from Event Data and sent in the
+    request payload
+  code: "const expectedEventAt = 1746467516146;\nmockData.eventAt = expectedEventAt;\n\
+    mockData.eventType = 'standard';\nconst expectedEventName = 'PageVisit';\nmockData.eventName\
+    \ = expectedEventName;\n\nconst expectedRequestUrl = 'https://ads-api.reddit.com/api/v2.0/conversions/events/'\
+    \ + expectedAccountId;\nconst expectedRequestOptions = {\n  headers: {\n    'Content-Type':\
+    \ 'application/json',\n    Authorization: 'Bearer ' + expectedAccessToken\n  },\n\
+    \  method: 'POST'\n};\n\nconst expectedClickId = 'expectedClickIdEventData';\n\
+    mock('getAllEventData',{\n  rdt_cid: expectedClickId\n});\n\nmock('sendHttpRequest',\
+    \ (requestUrl, callback, requestOptions, requestBody) => {\n  const requestBodyParsed\
+    \ = JSON.parse(requestBody);\n  assertThat(requestUrl).isEqualTo(expectedRequestUrl);\n\
+    \  assertThat(callback).isFunction();\n  assertThat(requestOptions).isEqualTo(expectedRequestOptions);\n\
+    \  assertThat(requestBodyParsed).isEqualTo({\n    events: [\n      {\n       \
+    \ event_type: { tracking_type: expectedEventName },\n        event_at: expectedEventAt,\n\
+    \        click_id: expectedClickId,\n        user: {},\n        event_metadata:\
+    \ {}\n      }\n    ]\n  });\n  \n  callback(200);\n});\n\nrunCode(mockData);\n\
+    \nassertApi('gtmOnSuccess').wasCalled();\nassertApi('gtmOnFailure').wasNotCalled();"
+- name: Click ID cookie is successfully retrieved from URL parameter and sent in the
+    request payload
+  code: "const expectedEventAt = 1746467516146;\nmockData.eventAt = expectedEventAt;\n\
+    mockData.eventType = 'standard';\nconst expectedEventName = 'PageVisit';\nmockData.eventName\
+    \ = expectedEventName;\n\nconst expectedRequestUrl = 'https://ads-api.reddit.com/api/v2.0/conversions/events/'\
+    \ + expectedAccountId;\nconst expectedRequestOptions = {\n  headers: {\n    'Content-Type':\
+    \ 'application/json',\n    Authorization: 'Bearer ' + expectedAccessToken\n  },\n\
+    \  method: 'POST'\n};\n\nconst expectedClickId = 'expectedClickIdEventData';\n\
+    mock('getAllEventData',{\n  page_location: 'https://example.com/?rdt_cid=' + expectedClickId\n\
+    });\n\nmock('sendHttpRequest', (requestUrl, callback, requestOptions, requestBody)\
+    \ => {\n  const requestBodyParsed = JSON.parse(requestBody);\n  assertThat(requestUrl).isEqualTo(expectedRequestUrl);\n\
+    \  assertThat(callback).isFunction();\n  assertThat(requestOptions).isEqualTo(expectedRequestOptions);\n\
+    \  assertThat(requestBodyParsed).isEqualTo({\n    events: [\n      {\n       \
+    \ event_type: { tracking_type: expectedEventName },\n        event_at: expectedEventAt,\n\
+    \        click_id: expectedClickId,\n        user: {},\n        event_metadata:\
+    \ {}\n      }\n    ]\n  });\n  \n  callback(200);\n});\n\nrunCode(mockData);\n\
+    \nassertApi('gtmOnSuccess').wasCalled();\nassertApi('gtmOnFailure').wasNotCalled();"
+- name: Click ID cookie is successfully retrieved from Data and sent in the request
+    payload
+  code: "const expectedEventAt = 1746467516146;\nmockData.eventAt = expectedEventAt;\n\
+    mockData.eventType = 'standard';\nconst expectedEventName = 'PageVisit';\nmockData.eventName\
+    \ = expectedEventName;\n\nconst expectedRequestUrl = 'https://ads-api.reddit.com/api/v2.0/conversions/events/'\
+    \ + expectedAccountId;\nconst expectedRequestOptions = {\n  headers: {\n    'Content-Type':\
+    \ 'application/json',\n    Authorization: 'Bearer ' + expectedAccessToken\n  },\n\
+    \  method: 'POST'\n};\n\nconst expectedClickId = 'expectedClickIdData';\nmockData.clickId\
+    \ = expectedClickId;\n\nmock('sendHttpRequest', (requestUrl, callback, requestOptions,\
+    \ requestBody) => {\n  const requestBodyParsed = JSON.parse(requestBody);\n  assertThat(requestUrl).isEqualTo(expectedRequestUrl);\n\
+    \  assertThat(callback).isFunction();\n  assertThat(requestOptions).isEqualTo(expectedRequestOptions);\n\
+    \  assertThat(requestBodyParsed).isEqualTo({\n    events: [\n      {\n       \
+    \ event_type: { tracking_type: expectedEventName },\n        event_at: expectedEventAt,\n\
+    \        click_id: expectedClickId,\n        user: {},\n        event_metadata:\
+    \ {}\n      }\n    ]\n  });\n  \n  callback(200);\n});\n\nrunCode(mockData);\n\
+    \nassertApi('gtmOnSuccess').wasCalled();\nassertApi('gtmOnFailure').wasNotCalled();"
+- name: Screen Dimensions are successfully retrieved from Event Data screen_dimensions
+    and cast to integer
+  code: "const expectedEventAt = 1746467516146;\nmockData.eventAt = expectedEventAt;\n\
+    mockData.eventType = 'standard';\nconst expectedEventName = 'PageVisit';\nmockData.eventName\
+    \ = expectedEventName;\n\nconst expectedRequestUrl = 'https://ads-api.reddit.com/api/v2.0/conversions/events/'\
+    \ + expectedAccountId;\nconst expectedRequestOptions = {\n  headers: {\n    'Content-Type':\
+    \ 'application/json',\n    Authorization: 'Bearer ' + expectedAccessToken\n  },\n\
+    \  method: 'POST'\n};\n\nconst expectedScreenDimensions = { width: 111, height:\
+    \ 222 };\nmock('getAllEventData', {\n  viewport_size: expectedScreenDimensions.width\
+    \ + 'x' + expectedScreenDimensions.height\n});\n\n\nmock('sendHttpRequest', (requestUrl,\
+    \ callback, requestOptions, requestBody) => {\n  const requestBodyParsed = JSON.parse(requestBody);\n\
+    \  assertThat(requestUrl).isEqualTo(expectedRequestUrl);\n  assertThat(callback).isFunction();\n\
+    \  assertThat(requestOptions).isEqualTo(expectedRequestOptions);\n  assertThat(requestBodyParsed).isEqualTo({\n\
+    \    events: [\n      {\n        event_type: { tracking_type: expectedEventName\
+    \ },\n        event_at: expectedEventAt,\n        user: {\n          screen_dimensions:\
+    \ { width: expectedScreenDimensions.width, height: expectedScreenDimensions.height\
+    \ }          \n        },\n        event_metadata: {}\n      }\n    ]\n  });\n\
+    \  \n  callback(200);\n});\n\nrunCode(mockData);\n\nassertApi('gtmOnSuccess').wasCalled();\n\
+    assertApi('gtmOnFailure').wasNotCalled();"
+- name: Screen Dimensions are successfully retrieved from Event Data width/height
+    and cast to integer
+  code: "const expectedEventAt = 1746467516146;\nmockData.eventAt = expectedEventAt;\n\
+    mockData.eventType = 'standard';\nconst expectedEventName = 'PageVisit';\nmockData.eventName\
+    \ = expectedEventName;\n\nconst expectedRequestUrl = 'https://ads-api.reddit.com/api/v2.0/conversions/events/'\
+    \ + expectedAccountId;\nconst expectedRequestOptions = {\n  headers: {\n    'Content-Type':\
+    \ 'application/json',\n    Authorization: 'Bearer ' + expectedAccessToken\n  },\n\
+    \  method: 'POST'\n};\n\nconst expectedScreenDimensions = { width: 111, height:\
+    \ 222 };\nmock('getAllEventData', {\n  width: expectedScreenDimensions.width,\n\
+    \  height: expectedScreenDimensions.height\n});\n\nmock('sendHttpRequest', (requestUrl,\
+    \ callback, requestOptions, requestBody) => {\n  const requestBodyParsed = JSON.parse(requestBody);\n\
+    \  assertThat(requestUrl).isEqualTo(expectedRequestUrl);\n  assertThat(callback).isFunction();\n\
+    \  assertThat(requestOptions).isEqualTo(expectedRequestOptions);\n  assertThat(requestBodyParsed).isEqualTo({\n\
+    \    events: [\n      {\n        event_type: { tracking_type: expectedEventName\
+    \ },\n        event_at: expectedEventAt,\n        user: {\n          screen_dimensions:\
+    \ { width: expectedScreenDimensions.width, height: expectedScreenDimensions.height\
+    \ }          \n        },\n        event_metadata: {}\n      }\n    ]\n  });\n\
+    \  \n  callback(200);\n});\n\nrunCode(mockData);\n\nassertApi('gtmOnSuccess').wasCalled();\n\
+    assertApi('gtmOnFailure').wasNotCalled();"
+setup: |-
+  const JSON = require('JSON');
+
+  const expectedAccountId = 'expectedAccountId';
+  const expectedAccessToken = 'expectedAccessToken';
+
+  const mockData = {
+    accountId: expectedAccountId,
+    accessToken: expectedAccessToken
+  };
 
 
 ___NOTES___
 
 Created on 28/07/2023, 16:50:17
-
 
