@@ -1,5 +1,7 @@
 homepage: 'https://stape.io/'
 versions:
+  - sha: 12acaa0d2d0095d2fc1655cef03a970f77592635
+    changeNotes: Fix screen_dimensions and Click ID values bug.
   - sha: 41fee6a7a6b3e49466f93e13771baed9d5a6b069
     changeNotes: Fix eventAt field.
   - sha: 6c2a85bd4611d5bbd8c358768ad049580f3a7ca6
