@@ -12,18 +12,16 @@ const getType = require('getType');
 const getTimestampMillis = require('getTimestampMillis');
 const makeNumber = require('makeNumber');
 const makeString = require('makeString');
+const makeInteger = require('makeInteger');
 const encodeUriComponent = require('encodeUriComponent');
+
+/**********************************************************************************************/
 
 const isLoggingEnabled = determinateIsLoggingEnabled();
 const traceId = isLoggingEnabled ? getRequestHeader('trace-id') : undefined;
 
 const eventData = getAllEventData();
 
-const apiVersion = '2.0';
-const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/conversions/events/' + enc(data.accountId);
-const eventType = getEventType(eventData, data);
-const eventName = eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type;
-const postBody = mapEvent(eventData, data);
 const url = eventData.page_location || getRequestHeader('referer');
 
 const deprecatedCookie = getCookieValues('rdt_cid')[0];
@@ -57,6 +55,13 @@ if (rdtcid) {
     httpOnly: false
   });
 }
+
+const apiVersion = '2.0';
+const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/conversions/events/' + enc(data.accountId);
+
+const eventType = getEventType(eventData, data);
+const eventName = eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type;
+const postBody = mapEvent(eventData, data);
 
 if (isLoggingEnabled) {
   logToConsole(
@@ -110,6 +115,9 @@ if (data.useOptimisticScenario) {
   data.gtmOnSuccess();
 }
 
+/**********************************************************************************************/
+// Vendor related functions
+
 function mapEvent(eventData, data) {
   let mappedData = {
     event_type: eventType
@@ -139,15 +147,15 @@ function mapEvent(eventData, data) {
 function addPropertiesData(eventData, mappedData) {
   mappedData.event_metadata = {};
 
-  if (eventData.event_id) mappedData.event_metadata.conversion_id = eventData.event_id;
-  else if (eventData.transaction_id) mappedData.event_metadata.conversion_id = eventData.transaction_id;
+  if (eventData.event_id) mappedData.event_metadata.conversion_id = makeString(eventData.event_id);
+  else if (eventData.transaction_id) mappedData.event_metadata.conversion_id = makeString(eventData.transaction_id);
 
   if (eventData.currency) mappedData.event_metadata.currency = eventData.currency;
   if (eventData.item_count) mappedData.event_metadata.item_count = eventData.item_count;
 
-  if (eventData.value) mappedData.event_metadata.value_decimal = makeNumber(eventData.value);
-  else if (eventData['x-ga-mp1-ev']) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-ev']);
-  else if (eventData['x-ga-mp1-tr']) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-tr']);
+  if (isValidValue(eventData.value)) mappedData.event_metadata.value_decimal = makeNumber(eventData.value);
+  else if (isValidValue(eventData['x-ga-mp1-ev'])) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-ev']);
+  else if (isValidValue(eventData['x-ga-mp1-tr'])) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-tr']);
 
   if (eventData.products) mappedData.event_metadata.products = eventData.products;
   else if (eventData.items && eventData.items[0]) {
@@ -156,8 +164,8 @@ function addPropertiesData(eventData, mappedData) {
     eventData.items.forEach((d, i) => {
       let item = {};
 
-      if (d.item_id) item.id = d.item_id;
-      else if (d.id) item.id = d.id;
+      if (d.item_id) item.id = makeString(d.item_id);
+      else if (d.id) item.id = makeString(d.id);
 
       if (d.content_category) item.category = d.content_category;
       else if (d.category) item.category = d.category;
@@ -171,7 +179,16 @@ function addPropertiesData(eventData, mappedData) {
 
   if (data.serverEventDataList) {
     data.serverEventDataList.forEach((d) => {
-      mappedData.event_metadata[d.name] = d.value;
+      let value = d.value;
+      switch (d.name) {
+        case 'value_decimal':
+          value = makeNumber(value);
+          break;
+        case 'value':
+          value = makeInteger(value);
+          break;
+      }
+      mappedData.event_metadata[d.name] = value;
     });
   }
 
@@ -213,13 +230,13 @@ function addUserData(eventData, mappedData) {
 
   if (eventData.viewport_size && eventData.viewport_size.split('x').length === 2) {
     mappedData.user.screen_dimensions = {
-      width: eventData.viewport_size.split('x')[0],
-      height: eventData.viewport_size.split('x')[1]
+      width: makeInteger(eventData.viewport_size.split('x')[0]),
+      height: makeInteger(eventData.viewport_size.split('x')[1])
     };
   } else if (eventData.height && eventData.width) {
     mappedData.user.screen_dimensions = {
-      height: eventData.height,
-      width: eventData.width
+      height: makeInteger(eventData.height),
+      width: makeInteger(eventData.width)
     };
   }
 
@@ -317,6 +334,18 @@ function getEventType(eventData, data) {
   };
 }
 
+/**********************************************************************************************/
+// Helpers
+
+function enc(data) {
+  return encodeUriComponent(data || '');
+}
+
+function isValidValue(value) {
+  const valueType = getType(value);
+  return valueType !== 'null' && valueType !== 'undefined' && value !== '';
+}
+
 function determinateIsLoggingEnabled() {
   const containerVersion = getContainerVersion();
   const isDebug = !!(containerVersion && (containerVersion.debugMode || containerVersion.previewMode));
@@ -334,9 +363,4 @@ function determinateIsLoggingEnabled() {
   }
 
   return data.logType === 'always';
-}
-
-function enc(data) {
-  data = data || '';
-  return encodeUriComponent(data);
 }

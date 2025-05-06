@@ -13,7 +13,7 @@ The Reddit Conversion API Tag allows conversion data to be sent from the Google 
 
 **Account ID** - ID of the Reddit Ads account to which the conversion event belongs.
 
-**Conversion Access Token** - a secure key that lets send conversion event data. 
+**Conversion Access Token** - a secure key that lets send conversion event data.
 
 **Test Mode** - indicates whether the conversion events should be processed.
 
@@ -30,16 +30,16 @@ The Reddit Conversion API Tag allows conversion data to be sent from the Google 
 ### Override User Data:
 - IP address
 - Email
-- External ID 
-- Idfa (Access identifier for advertisers) 
+- External ID
+- Idfa (Access identifier for advertisers)
 - Aaid (Android Advertising ID)
 - Opt out
-- User Agent 
+- User Agent
 - Screen Dimensions
 - UUID (Universally Unique Identifier)
 
-## Useful link
-[How to set up the Reddit CAPI tag](https://stape.io/blog/reddit-conversion-api-tag-for-server-google-tag-manager#how-to-set-up-reddit-capi-tag)
+## Useful resouces
+- [How to set up the Reddit CAPI tag](https://stape.io/blog/reddit-conversion-api-tag-for-server-google-tag-manager#how-to-set-up-reddit-capi-tag)
 
 ## Open Source
-Reddit Tag for GTM Server Side is developed and maintained by Stape Team under the Apache 2.0 license.
+The **Reddit Tag for GTM Server Side** is developed and maintained by [Stape Team](https://stape.io/) under the Apache 2.0 license.
