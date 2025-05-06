@@ -153,9 +153,9 @@ function addPropertiesData(eventData, mappedData) {
   if (eventData.currency) mappedData.event_metadata.currency = eventData.currency;
   if (eventData.item_count) mappedData.event_metadata.item_count = eventData.item_count;
 
-  if (eventData.value) mappedData.event_metadata.value_decimal = makeNumber(eventData.value);
-  else if (eventData['x-ga-mp1-ev']) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-ev']);
-  else if (eventData['x-ga-mp1-tr']) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-tr']);
+  if (isValidValue(eventData.value)) mappedData.event_metadata.value_decimal = makeNumber(eventData.value);
+  else if (isValidValue(eventData['x-ga-mp1-ev'])) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-ev']);
+  else if (isValidValue(eventData['x-ga-mp1-tr'])) mappedData.event_metadata.value_decimal = makeNumber(eventData['x-ga-mp1-tr']);
 
   if (eventData.products) mappedData.event_metadata.products = eventData.products;
   else if (eventData.items && eventData.items[0]) {
@@ -337,6 +337,15 @@ function getEventType(eventData, data) {
 /**********************************************************************************************/
 // Helpers
 
+function enc(data) {
+  return encodeUriComponent(data || '');
+}
+
+function isValidValue(value) {
+  const valueType = getType(value);
+  return valueType !== 'null' && valueType !== 'undefined' && value !== '';
+}
+
 function determinateIsLoggingEnabled() {
   const containerVersion = getContainerVersion();
   const isDebug = !!(containerVersion && (containerVersion.debugMode || containerVersion.previewMode));
@@ -354,8 +363,4 @@ function determinateIsLoggingEnabled() {
   }
 
   return data.logType === 'always';
-}
-
-function enc(data) {
-  return encodeUriComponent(data || '');
 }
