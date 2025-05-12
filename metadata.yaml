@@ -1,5 +1,8 @@
 homepage: 'https://stape.io/'
+documentation: 'https://github.com/stape-io/reddit-tag'
 versions:
+  - sha: f74f56901f386cf5b22f48b9dafdabcb4520a7ac
+    changeNotes: Updated description.
   - sha: 7ad1eaf2d04d93867a8d057893ba76c455b1d42f
     changeNotes: Fix screen_dimensions and Click ID values bug. Force value, value_decimal conversion_id and item.id type casting.
   - sha: 41fee6a7a6b3e49466f93e13771baed9d5a6b069
