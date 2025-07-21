@@ -1,7 +1,7 @@
 homepage: 'https://stape.io/'
 documentation: 'https://github.com/stape-io/reddit-tag'
 versions:
-  - sha: 8f1627ffc2638ba30ede2160636b22fcc03dc39d
+  - sha: 4171e3c3e51dd426e6869df9fcfcf7e493e48482
     changeNotes: Added Reddit Test ID support.
   - sha: f74f56901f386cf5b22f48b9dafdabcb4520a7ac
     changeNotes: Updated description.

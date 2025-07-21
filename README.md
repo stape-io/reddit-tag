@@ -15,6 +15,8 @@ The Reddit Conversion API Tag allows conversion data to be sent from the Google 
 
 **Conversion Access Token** - a secure key that lets send conversion event data.
 
+**Test ID** - ID for using the [Reddit Event Testing Tool](https://ads.reddit.com/events-manager/testing).
+
 **Test Mode** - indicates whether the conversion events should be processed.
 
 **Use Optimistic Scenario** - the tag will trigger gtmOnSuccess() immediately without waiting for an API response. While this feature improves sGTM's response time, it also means that even if the tag fails to fire correctly, it will still report a success status.
@@ -31,8 +33,8 @@ The Reddit Conversion API Tag allows conversion data to be sent from the Google 
 - IP address
 - Email
 - External ID
-- Idfa (Access identifier for advertisers)
-- Aaid (Android Advertising ID)
+- IDFA (Access identifier for advertisers)
+- AAID (Android Advertising ID)
 - Opt out
 - User Agent
 - Screen Dimensions
