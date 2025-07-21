@@ -140,7 +140,8 @@ function mapEvent(eventData, data) {
 
   return {
     events: [mappedData],
-    test_mode: data.testMode
+    test_mode: data.testMode,
+    test_id: data.testId
   };
 }
 

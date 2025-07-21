@@ -134,11 +134,25 @@ ___TEMPLATE_PARAMETERS___
     ]
   },
   {
+    "type": "TEXT",
+    "name": "testId",
+    "displayName": "Test ID",
+    "simpleValueType": true,
+    "help": "Test your events using the Reddit Event Testing Tool.\n\u003cbr/\u003e\nThis field can’t be used when the “Test Mode” option below is checked.",
+    "enablingConditions": [
+      {
+        "paramName": "testMode",
+        "paramValue": false,
+        "type": "EQUALS"
+      }
+    ]
+  },
+  {
     "type": "CHECKBOX",
     "name": "testMode",
     "checkboxText": "Test Mode",
     "simpleValueType": true,
-    "help": "boolean A flag indicating whether the conversion events should be processed. This can be set to \"true\" when testing out the API integration and no data will be posted to the account."
+    "help": "A flag indicating whether the events should be processed.\n\u003cbr/\u003e\nCheck this field when testing out the API integration and no data will be posted to the account.\n\u003cbr/\u003e\nWhen checked, it can’t be used together with the “Test ID” option above."
   },
   {
     "type": "CHECKBOX",
@@ -474,7 +488,8 @@ function mapEvent(eventData, data) {
 
   return {
     events: [mappedData],
-    test_mode: data.testMode
+    test_mode: data.testMode,
+    test_id: data.testId
   };
 }
 
