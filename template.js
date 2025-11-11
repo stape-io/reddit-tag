@@ -167,18 +167,18 @@ function mapEvent(eventData, data) {
 function addPropertiesData(eventData, mappedData) {
   if (eventData.event_id) mappedData.metadata.conversion_id = makeString(eventData.event_id);
   else if (eventData.transaction_id) mappedData.metadata.conversion_id = makeString(eventData.transaction_id);
-  else if (eventDataMap.conversion_id) mappedData.metadata.conversion_id = makeString(eventDataMap.conversion_id);
+  else if (eventDataMap && eventDataMap.conversion_id) mappedData.metadata.conversion_id = makeString(eventDataMap.conversion_id);
 
   if (eventData.currency) mappedData.metadata.currency = eventData.currency;
-  else if (eventDataMap.currency) mappedData.metadata.currency = eventDataMap.currency;
+  else if (eventDataMap && eventDataMap.currency) mappedData.metadata.currency = eventDataMap.currency;
 
   if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
-  else if (eventDataMap.item_count) mappedData.metadata.item_count = eventDataMap.item_count;
+  else if (eventDataMap && eventDataMap.item_count) mappedData.metadata.item_count = eventDataMap.item_count;
 
   if (isValidValue(eventData.value)) mappedData.metadata.value = makeNumber(eventData.value);
   else if (isValidValue(eventData['x-ga-mp1-ev'])) mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-ev']);
   else if (isValidValue(eventData['x-ga-mp1-tr'])) mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-tr']);
-  else if (eventDataMap.value) mappedData.metadata.value = makeNumber(eventDataMap.value);
+  else if (eventDataMap && eventDataMap.value) mappedData.metadata.value = makeNumber(eventDataMap.value);
 
   if (eventData.products) mappedData.metadata.products = eventData.products;
   else if (eventData.items && eventData.items[0]) {
@@ -200,7 +200,7 @@ function addPropertiesData(eventData, mappedData) {
 
       mappedData.metadata.products.push(item);
     });
-  } else if (getType(eventDataMap.products) === 'array' && eventDataMap.products.length) {
+  } else if (getType(eventDataMap && eventDataMap.products) === 'array' && eventDataMap.products.length) {
     mappedData.metadata.products = eventDataMap.products;
   }
   return mappedData;
