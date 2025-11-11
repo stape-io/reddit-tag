@@ -29,7 +29,6 @@ const eventData = getAllEventData();
 const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/pixels/' + data.pixelId + '/conversion_events';
 const eventType = getEventType(eventData, data);
 const eventName = eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type;
-const userDataMap = data.userDataList ? makeTableMap(data.userDataList, 'name', 'value') : undefined;
 const eventDataMap = data.serverEventDataList ? makeTableMap(data.serverEventDataList, 'name', 'value') : undefined;
 const postBody = mapEvent(eventData, data);
 const url = eventData.page_location || getRequestHeader('referer');
@@ -46,58 +45,62 @@ if (!isConsentGivenOrNotRequired(data, eventData)) {
 
 handleRedditCookie();
 
-log(
-  JSON.stringify({
-    Name: 'Reddit',
-    Type: 'Request',
-    TraceId: traceId,
-    EventName: eventName,
-    RequestMethod: 'POST',
-    RequestUrl: postUrl,
-    RequestBody: postBody
-  })
-);
-
-sendHttpRequest(
-  postUrl,
-  (statusCode, headers, body) => {
-    log(
-      JSON.stringify({
-        Name: 'Reddit',
-        Type: 'Response',
-        TraceId: traceId,
-        EventName: eventName,
-        ResponseStatusCode: statusCode,
-        ResponseHeaders: headers,
-        ResponseBody: body
-      })
-    );
-
-    if (!data.useOptimisticScenario) {
-      if (statusCode >= 200 && statusCode < 400) {
-        data.gtmOnSuccess();
-      } else {
-        data.gtmOnFailure();
-      }
-    }
-  },
-  {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + data.accessToken
-    },
-    method: 'POST'
-  },
-  JSON.stringify(postBody)
-);
-
-if (data.useOptimisticScenario) {
-  data.gtmOnSuccess();
-}
+sendRedditRequest(postUrl, postBody);
 
 /******************************************************************************
  * Vendor related functions
  * **************************************************************************/
+
+function sendRedditRequest(postUrl, postBody) {
+  log(
+    JSON.stringify({
+      Name: 'Reddit',
+      Type: 'Request',
+      TraceId: traceId,
+      EventName: eventName,
+      RequestMethod: 'POST',
+      RequestUrl: postUrl,
+      RequestBody: postBody
+    })
+  );
+
+  sendHttpRequest(
+    postUrl,
+    (statusCode, headers, body) => {
+      log(
+        JSON.stringify({
+          Name: 'Reddit',
+          Type: 'Response',
+          TraceId: traceId,
+          EventName: eventName,
+          ResponseStatusCode: statusCode,
+          ResponseHeaders: headers,
+          ResponseBody: body
+        })
+      );
+
+      if (!data.useOptimisticScenario) {
+        if (statusCode >= 200 && statusCode < 400) {
+          data.gtmOnSuccess();
+        } else {
+          data.gtmOnFailure();
+        }
+      }
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + data.accessToken
+      },
+      method: 'POST'
+    },
+    JSON.stringify(postBody)
+  );
+
+  if (data.useOptimisticScenario) {
+    data.gtmOnSuccess();
+  }
+}
 
 function handleRedditCookie() {
   if (deprecatedCookie) {
