@@ -499,7 +499,6 @@ if (!isConsentGivenOrNotRequired(data, eventData)) {
 
 handleRedditCookie();
 
-if (isLoggingEnabled) {
   log(
     JSON.stringify({
       Name: 'Reddit',
@@ -511,12 +510,10 @@ if (isLoggingEnabled) {
       RequestBody: postBody
     })
   );
-}
 
 sendHttpRequest(
   postUrl,
   (statusCode, headers, body) => {
-    if (isLoggingEnabled) {
       log(
         JSON.stringify({
           Name: 'Reddit',
@@ -528,7 +525,7 @@ sendHttpRequest(
           ResponseBody: body
         })
       );
-    }
+
     if (!data.useOptimisticScenario) {
       if (statusCode >= 200 && statusCode < 400) {
         data.gtmOnSuccess();

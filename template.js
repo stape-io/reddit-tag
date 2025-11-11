@@ -46,36 +46,33 @@ if (!isConsentGivenOrNotRequired(data, eventData)) {
 
 handleRedditCookie();
 
-if (isLoggingEnabled) {
-  log(
-    JSON.stringify({
-      Name: 'Reddit',
-      Type: 'Request',
-      TraceId: traceId,
-      EventName: eventName,
-      RequestMethod: 'POST',
-      RequestUrl: postUrl,
-      RequestBody: postBody
-    })
-  );
-}
+log(
+  JSON.stringify({
+    Name: 'Reddit',
+    Type: 'Request',
+    TraceId: traceId,
+    EventName: eventName,
+    RequestMethod: 'POST',
+    RequestUrl: postUrl,
+    RequestBody: postBody
+  })
+);
 
 sendHttpRequest(
   postUrl,
   (statusCode, headers, body) => {
-    if (isLoggingEnabled) {
-      log(
-        JSON.stringify({
-          Name: 'Reddit',
-          Type: 'Response',
-          TraceId: traceId,
-          EventName: eventName,
-          ResponseStatusCode: statusCode,
-          ResponseHeaders: headers,
-          ResponseBody: body
-        })
-      );
-    }
+    log(
+      JSON.stringify({
+        Name: 'Reddit',
+        Type: 'Response',
+        TraceId: traceId,
+        EventName: eventName,
+        ResponseStatusCode: statusCode,
+        ResponseHeaders: headers,
+        ResponseBody: body
+      })
+    );
+
     if (!data.useOptimisticScenario) {
       if (statusCode >= 200 && statusCode < 400) {
         data.gtmOnSuccess();
