@@ -278,32 +278,32 @@ function getEventType(eventData, data) {
     let eventName = eventData.event_name;
 
     let gaToEventName = {
-      page_view: 'PageVisit',
-      click: 'Lead',
-      download: 'Lead',
-      file_download: 'Lead',
-      complete_registration: 'SignUp',
-      'gtm.dom': 'PageVisit',
-      add_payment_info: 'Lead',
-      add_to_cart: 'AddToCart',
-      add_to_wishlist: 'AddToWishlist',
-      sign_up: 'SignUp',
-      begin_checkout: 'Lead',
-      generate_lead: 'Lead',
-      purchase: 'Purchase',
-      search: 'Search',
-      view_item: 'ViewContent',
+      page_view: 'PAGE_VISIT',
+      click: 'LEAD',
+      download: 'LEAD',
+      file_download: 'LEAD',
+      complete_registration: 'SIGN_UP',
+      'gtm.dom': 'PAGE_VISIT',
+      add_payment_info: 'LEAD',
+      add_to_cart: 'ADD_TO_CART',
+      add_to_wishlist: 'ADD_TO_WISHLIST',
+      sign_up: 'SIGN_UP',
+      begin_checkout: 'LEAD',
+      generate_lead: 'LEAD',
+      purchase: 'PURCHASE',
+      search: 'SEARCH',
+      view_item: 'VIEW_CONTENT',
 
-      contact: 'Lead',
-      find_location: 'Search',
-      submit_application: 'Lead',
-      subscribe: 'Lead',
+      contact: 'LEAD',
+      find_location: 'SEARCH',
+      submit_application: 'LEAD',
+      subscribe: 'LEAD',
 
-      'gtm4wp.addProductToCartEEC': 'AddToCart',
-      'gtm4wp.productClickEEC': 'ViewContent',
-      'gtm4wp.checkoutOptionEEC': 'Lead',
-      'gtm4wp.checkoutStepEEC': 'Lead',
-      'gtm4wp.orderCompletedEEC': 'Purchase'
+      'gtm4wp.addProductToCartEEC': 'ADD_TO_CART',
+      'gtm4wp.productClickEEC': 'VIEW_CONTENT',
+      'gtm4wp.checkoutOptionEEC': 'LEAD',
+      'gtm4wp.checkoutStepEEC': 'LEAD',
+      'gtm4wp.orderCompletedEEC': 'PURCHASE'
     };
 
     if (!gaToEventName[eventName]) {
