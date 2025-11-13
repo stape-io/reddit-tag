@@ -1,6 +1,11 @@
 homepage: 'https://stape.io/'
 documentation: 'https://github.com/stape-io/reddit-tag'
 versions:
+  - sha: 2781395b7235e5ab40964caf58c34e0d99c00519
+    changeNotes: |2
+      BREAKING CHANGES! CAREFULLY REVIEW ALL YOUR REDDIT TAGS.
+      API v3 bump part 2.
+      Requires attention to new format of the "Value" field, and deprecation of "Opt-Out" and "Value Decimal" fields.
   - sha: cc5eb15cd96fda3a71c14c733a21be969e67c41a
     changeNotes: |2
       BREAKING CHANGES! CAREFULLY REVIEW ALL YOUR REDDIT TAGS.
