@@ -279,11 +279,11 @@ function addUserData(eventData, mappedData) {
   if (data.userDataList) {
     data.userDataList.forEach((userProperty) => {
       // Retrocompatibility v2 -> v3
-      if (userProperty.name === 'opt_out' && userProperty.value) {
-        mappedData.user.data_processing_options = {
+      if ((userProperty.name === 'opt_out' || userProperty.name.indexOf('data_processing_options' !== -1)) && userProperty.value) {
+        mappedData.user.data_processing_options = mappedData.user.data_processing_options = {
           modes: ['LDU']
         };
-        return;
+        if (userProperty.name === 'opt_out') return;
       }
 
       const names = userProperty.name.split('.');
