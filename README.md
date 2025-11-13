@@ -11,13 +11,11 @@ The Reddit Conversion API Tag allows conversion data to be sent from the Google 
 
 **Event Name Setup Method** - select from a list of standard events, add a custom event, or choose to Inherit an event name from a client. When Inherit from a client is selected, the Reddit CAPI tag will try to map events automatically into standard events or use a custom name if it’s impossible to map into a starred event.
 
-**Account ID** - ID of the Reddit Ads account to which the conversion event belongs.
+**Pixel ID** - ID of the pixel (data source) on your Reddit Ads account. It can be found in the Reddit Events Manager.
 
 **Conversion Access Token** - a secure key that lets send conversion event data.
 
 **Test ID** - ID for using the [Reddit Event Testing Tool](https://ads.reddit.com/events-manager/testing).
-
-**Test Mode** - indicates whether the conversion events should be processed.
 
 **Use Optimistic Scenario** - the tag will trigger gtmOnSuccess() immediately without waiting for an API response. While this feature improves sGTM's response time, it also means that even if the tag fails to fire correctly, it will still report a success status.
 
@@ -27,15 +25,15 @@ The Reddit Conversion API Tag allows conversion data to be sent from the Google 
 - Item count
 - Products
 - Value
-- Value Decimal
 
 ### Override User Data:
 - IP address
 - Email
+- Phone Number
 - External ID
 - IDFA (Access identifier for advertisers)
 - AAID (Android Advertising ID)
-- Opt out
+- Opt out / Data Processing Options
 - User Agent
 - Screen Dimensions
 - UUID (Universally Unique Identifier)

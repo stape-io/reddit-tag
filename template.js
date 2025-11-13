@@ -4,6 +4,7 @@ const sendHttpRequest = require('sendHttpRequest');
 const setCookie = require('setCookie');
 const getCookieValues = require('getCookieValues');
 const getContainerVersion = require('getContainerVersion');
+const getEventData = require('getEventData');
 const logToConsole = require('logToConsole');
 const getRequestHeader = require('getRequestHeader');
 const parseUrl = require('parseUrl');
@@ -17,67 +18,63 @@ const encodeUriComponent = require('encodeUriComponent');
 const createRegex = require('createRegex');
 const testRegex = require('testRegex');
 const BigQuery = require('BigQuery');
-const makeTableMap = require('makeTableMap');
+const computeEffectiveTldPlusOne = require('computeEffectiveTldPlusOne');
 
-/**********************************************************************************************/
+/*==============================================================================
+==============================================================================*/
 
-const isLoggingEnabled = determinateIsLoggingEnabled();
-const timestampMillisRegex = createRegex('^[0-9]+$');
-const traceId = isLoggingEnabled ? getRequestHeader('trace-id') : undefined;
-const apiVersion = '3';
 const eventData = getAllEventData();
-const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/pixels/' + data.pixelId + '/conversion_events';
-const eventType = getEventType(eventData, data);
-const eventName = eventType.tracking_type === 'Custom' ? eventType.custom_event_name : eventType.tracking_type;
-const eventDataMap = data.serverEventDataList ? makeTableMap(data.serverEventDataList, 'name', 'value') : undefined;
-const postBody = mapEvent(eventData, data);
-const url = eventData.page_location || getRequestHeader('referer');
-const deprecatedCookie = getCookieValues('rdt_cid')[0];
-let rdtcid = deprecatedCookie || getCookieValues('_rdt_cid')[0] || eventData.rdt_cid;
-
-/*******************************************************
- * Main execution
- * ****************************************************/
 
 if (!isConsentGivenOrNotRequired(data, eventData)) {
   return data.gtmOnSuccess();
 }
 
-handleRedditCookie();
+const url = getUrl(eventData);
+if (url && url.lastIndexOf('https://gtm-msr.appspot.com/', 0) === 0) {
+  return data.gtmOnSuccess();
+}
 
+const deprecatedCookie = getCookieValues('rdt_cid')[0];
+let rdtcid = deprecatedCookie || getCookieValues('_rdt_cid')[0] || eventData.rdt_cid;
+handleRedditCookie(url);
+
+const apiVersion = '3';
+const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/pixels/' + enc(data.accountId) + '/conversion_events';
+const postBody = mapEvent(eventData, data);
 sendRedditRequest(postUrl, postBody);
 
-/******************************************************************************
- * Vendor related functions
- * **************************************************************************/
+if (data.useOptimisticScenario) {
+  return data.gtmOnSuccess();
+}
+
+/*==============================================================================
+  Vendor related functions
+==============================================================================*/
 
 function sendRedditRequest(postUrl, postBody) {
-  log(
-    JSON.stringify({
-      Name: 'Reddit',
-      Type: 'Request',
-      TraceId: traceId,
-      EventName: eventName,
-      RequestMethod: 'POST',
-      RequestUrl: postUrl,
-      RequestBody: postBody
-    })
-  );
+  const eventType = postBody.data.events[0].type;
+  const eventName = eventType.tracking_type === 'CUSTOM' ? eventType.custom_event_name : eventType.tracking_type;
+
+  log({
+    Name: 'Reddit',
+    Type: 'Request',
+    EventName: eventName,
+    RequestMethod: 'POST',
+    RequestUrl: postUrl,
+    RequestBody: postBody
+  });
 
   sendHttpRequest(
     postUrl,
     (statusCode, headers, body) => {
-      log(
-        JSON.stringify({
-          Name: 'Reddit',
-          Type: 'Response',
-          TraceId: traceId,
-          EventName: eventName,
-          ResponseStatusCode: statusCode,
-          ResponseHeaders: headers,
-          ResponseBody: body
-        })
-      );
+      log({
+        Name: 'Reddit',
+        Type: 'Response',
+        EventName: eventName,
+        ResponseStatusCode: statusCode,
+        ResponseHeaders: headers,
+        ResponseBody: body
+      });
 
       if (!data.useOptimisticScenario) {
         if (statusCode >= 200 && statusCode < 400) {
@@ -96,16 +93,12 @@ function sendRedditRequest(postUrl, postBody) {
     },
     JSON.stringify(postBody)
   );
-
-  if (data.useOptimisticScenario) {
-    data.gtmOnSuccess();
-  }
 }
 
-function handleRedditCookie() {
+function handleRedditCookie(url) {
   if (deprecatedCookie) {
     setCookie('rdt_cid', '', {
-      domain: 'auto',
+      domain: getCookieAutoDomain(),
       path: '/',
       samesite: 'Lax',
       secure: true,
@@ -124,7 +117,7 @@ function handleRedditCookie() {
 
   if (rdtcid) {
     setCookie('_rdt_cid', rdtcid, {
-      domain: 'auto',
+      domain: getCookieAutoDomain(),
       path: '/',
       samesite: 'Lax',
       secure: true,
@@ -136,14 +129,18 @@ function handleRedditCookie() {
 
 function mapEvent(eventData, data) {
   let mappedData = {
-    type: eventType,
+    type: getEventType(eventData, data),
     event_at: getTimestampMillis(),
     action_source: 'WEBSITE',
-    metadata: {}
+    metadata: {},
+    user: {}
   };
 
-  if (data.eventAtMs) {
-    mappedData.event_at = testRegex(timestampMillisRegex, makeString(data.eventAtMs)) ? mappedData.event_at : convertISOToTimeMs(data.eventAtMs);
+  const eventAt = data.eventAt;
+  if (eventAt) {
+    const timestampMillisRegex = createRegex('^[0-9]+$');
+    // Retrocompatibility v2 -> v3
+    mappedData.event_at = testRegex(timestampMillisRegex, makeString(eventAt)) ? makeInteger(eventAt) : convertISOToTimeMs(eventAt);
   }
 
   if (data.clickId) {
@@ -153,7 +150,6 @@ function mapEvent(eventData, data) {
   }
 
   mappedData = addUserData(eventData, mappedData);
-
   mappedData = addPropertiesData(eventData, mappedData);
 
   return {
@@ -167,18 +163,13 @@ function mapEvent(eventData, data) {
 function addPropertiesData(eventData, mappedData) {
   if (eventData.event_id) mappedData.metadata.conversion_id = makeString(eventData.event_id);
   else if (eventData.transaction_id) mappedData.metadata.conversion_id = makeString(eventData.transaction_id);
-  else if (eventDataMap && eventDataMap.conversion_id) mappedData.metadata.conversion_id = makeString(eventDataMap.conversion_id);
 
   if (eventData.currency) mappedData.metadata.currency = eventData.currency;
-  else if (eventDataMap && eventDataMap.currency) mappedData.metadata.currency = eventDataMap.currency;
-
   if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
-  else if (eventDataMap && eventDataMap.item_count) mappedData.metadata.item_count = eventDataMap.item_count;
 
   if (isValidValue(eventData.value)) mappedData.metadata.value = makeNumber(eventData.value);
   else if (isValidValue(eventData['x-ga-mp1-ev'])) mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-ev']);
   else if (isValidValue(eventData['x-ga-mp1-tr'])) mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-tr']);
-  else if (eventDataMap && eventDataMap.value) mappedData.metadata.value = makeNumber(eventDataMap.value);
 
   if (eventData.products) mappedData.metadata.products = eventData.products;
   else if (eventData.items && eventData.items[0]) {
@@ -200,20 +191,29 @@ function addPropertiesData(eventData, mappedData) {
 
       mappedData.metadata.products.push(item);
     });
-  } else if (getType(eventDataMap && eventDataMap.products) === 'array' && eventDataMap.products.length) {
-    mappedData.metadata.products = eventDataMap.products;
   }
+
+  if (data.serverEventDataList) {
+    data.serverEventDataList.forEach((serverData) => {
+      let name = serverData.name;
+      let value = serverData.value;
+      switch (serverData.name) {
+        case 'value_decimal':
+        case 'value':
+          name = 'value'; // Retrocompatibility v2 -> v3
+          value = makeNumber(value);
+          break;
+      }
+      mappedData.metadata[name] = value;
+    });
+  }
+
   return mappedData;
 }
 
 function addUserData(eventData, mappedData) {
   const uuid = getUUIDFromCookie() || eventData.rdt_uuid;
   let userEventData = {};
-  mappedData.user = {
-    data_processing_options: {
-      modes: ['LDU']
-    }
-  };
 
   if (getType(eventData.user_data) === 'object') {
     userEventData = eventData.user_data || eventData.user_properties || eventData.user;
@@ -221,8 +221,19 @@ function addUserData(eventData, mappedData) {
 
   if (uuid) mappedData.user.uuid = uuid;
 
+  const platform = eventData['x-ga-platform'];
+
   if (eventData.aaid) mappedData.user.aaid = eventData.aaid;
   else if (userEventData.aaid) mappedData.user.aaid = userEventData.aaid;
+  else if (platform === 'android' && eventData['x-ga-resettable_device_id']) {
+    mappedData.user.aaid = eventData['x-ga-resettable_device_id'];
+  }
+
+  if (eventData.idfa) mappedData.user.idfa = eventData.idfa;
+  else if (userEventData.idfa) mappedData.user.idfa = userEventData.idfa;
+  else if (platform === 'ios' && eventData['x-ga-resettable_device_id']) {
+    mappedData.user.idfa = eventData['x-ga-resettable_device_id'];
+  }
 
   if (eventData.email) mappedData.user.email = eventData.email;
   else if (eventData.email_address) mappedData.user.email = eventData.email_address;
@@ -230,7 +241,9 @@ function addUserData(eventData, mappedData) {
   else if (userEventData.email_address) mappedData.user.email = userEventData.email_address;
   else if (getCookieValues('_rdt_em')[0]) mappedData.user.email = getCookieValues('_rdt_em')[0];
 
-  if (eventData.phone_number) mappedData.user.phone_number = eventData.phone_number;
+  if (eventData.phone) mappedData.user.phone_number = eventData.phone;
+  else if (eventData.phone_number) mappedData.user.phone_number = eventData.phone_number;
+  else if (userEventData.phone) mappedData.user.phone_number = userEventData.phone;
   else if (userEventData.phone_number) mappedData.user.phone_number = userEventData.phone_number;
 
   if (eventData.external_id) mappedData.user.external_id = eventData.external_id;
@@ -238,12 +251,16 @@ function addUserData(eventData, mappedData) {
   else if (eventData.userId) mappedData.user.external_id = eventData.userId;
   else if (userEventData.external_id) mappedData.user.external_id = userEventData.external_id;
 
-  if (eventData.idfa) mappedData.user.idfa = eventData.idfa;
-  else if (userEventData.idfa) mappedData.user.idfa = userEventData.idfa;
-
   if (eventData.ip_override) mappedData.user.ip_address = eventData.ip_override;
   else if (eventData.ip_address) mappedData.user.ip_address = eventData.ip_address;
   else if (eventData.ip) mappedData.user.ip_address = eventData.ip;
+
+  // Retrocompatibility v2 -> v3
+  if (eventData.opt_out) {
+    mappedData.user.data_processing_options = {
+      modes: ['LDU']
+    };
+  }
 
   if (eventData.user_agent) mappedData.user.user_agent = eventData.user_agent;
 
@@ -261,7 +278,21 @@ function addUserData(eventData, mappedData) {
 
   if (data.userDataList) {
     data.userDataList.forEach((userProperty) => {
-      mappedData.user[userProperty.name] = userProperty.value;
+      // Retrocompatibility v2 -> v3
+      if (userProperty.name === 'opt_out' && userProperty.value) {
+        mappedData.user.data_processing_options = {
+          modes: ['LDU']
+        };
+        return;
+      }
+
+      const names = userProperty.name.split('.');
+      names.reduce((acc, name, index) => {
+        const isLastKey = index === names.length - 1;
+        if (isLastKey) acc[name] = userProperty.value;
+        else acc[name] = acc[name] || {};
+        return acc[name];
+      }, mappedData.user);
     });
   }
 
@@ -293,9 +324,9 @@ function getUUIDAndTimestamp(uuidWithTimestamp) {
 
 function getEventType(eventData, data) {
   if (data.eventType === 'inherit') {
-    let eventName = eventData.event_name;
+    const eventName = eventData.event_name;
 
-    let gaToEventName = {
+    const gaToEventName = {
       page_view: 'PAGE_VISIT',
       click: 'LEAD',
       download: 'LEAD',
@@ -325,7 +356,7 @@ function getEventType(eventData, data) {
 
     if (!gaToEventName[eventName]) {
       return {
-        tracking_type: 'Custom',
+        tracking_type: 'CUSTOM',
         custom_event_name: eventName
       };
     }
@@ -336,8 +367,19 @@ function getEventType(eventData, data) {
   }
 
   if (data.eventType === 'custom') {
+    // Retrocompatibility v2 -> v3
+    const retroCompatEventNameMapping = {
+      Purchase: 'PURCHASE',
+      SignUp: 'SIGN_UP'
+    };
+    if (retroCompatEventNameMapping[data.eventNameCustom]) {
+      return {
+        tracking_type: retroCompatEventNameMapping[data.eventNameCustom]
+      };
+    }
+
     return {
-      tracking_type: 'Custom',
+      tracking_type: 'CUSTOM',
       custom_event_name: data.eventNameCustom
     };
   }
@@ -347,9 +389,17 @@ function getEventType(eventData, data) {
   };
 }
 
-/**************************************************************************
- * Helpers
- * ************************************************************************/
+/*==============================================================================
+  Helpers
+==============================================================================*/
+
+function getUrl(eventData) {
+  return eventData.page_location || eventData.page_referrer || getRequestHeader('referer');
+}
+
+function getCookieAutoDomain() {
+  return computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) || 'auto';
+}
 
 function enc(data) {
   return encodeUriComponent(data || '');
