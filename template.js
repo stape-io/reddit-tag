@@ -1,24 +1,24 @@
-const getAllEventData = require('getAllEventData');
-const JSON = require('JSON');
-const sendHttpRequest = require('sendHttpRequest');
-const setCookie = require('setCookie');
-const getCookieValues = require('getCookieValues');
-const getContainerVersion = require('getContainerVersion');
-const getEventData = require('getEventData');
-const logToConsole = require('logToConsole');
-const getRequestHeader = require('getRequestHeader');
-const parseUrl = require('parseUrl');
-const decodeUriComponent = require('decodeUriComponent');
-const getType = require('getType');
-const getTimestampMillis = require('getTimestampMillis');
-const makeNumber = require('makeNumber');
-const makeString = require('makeString');
-const makeInteger = require('makeInteger');
-const encodeUriComponent = require('encodeUriComponent');
-const createRegex = require('createRegex');
-const testRegex = require('testRegex');
 const BigQuery = require('BigQuery');
 const computeEffectiveTldPlusOne = require('computeEffectiveTldPlusOne');
+const createRegex = require('createRegex');
+const decodeUriComponent = require('decodeUriComponent');
+const encodeUriComponent = require('encodeUriComponent');
+const getAllEventData = require('getAllEventData');
+const getContainerVersion = require('getContainerVersion');
+const getCookieValues = require('getCookieValues');
+const getEventData = require('getEventData');
+const getRequestHeader = require('getRequestHeader');
+const getTimestampMillis = require('getTimestampMillis');
+const getType = require('getType');
+const JSON = require('JSON');
+const logToConsole = require('logToConsole');
+const makeInteger = require('makeInteger');
+const makeNumber = require('makeNumber');
+const makeString = require('makeString');
+const parseUrl = require('parseUrl');
+const sendHttpRequest = require('sendHttpRequest');
+const setCookie = require('setCookie');
+const testRegex = require('testRegex');
 
 /*==============================================================================
 ==============================================================================*/
@@ -39,7 +39,12 @@ let rdtcid = deprecatedCookie || getCookieValues('_rdt_cid')[0] || eventData.rdt
 handleRedditCookie(url);
 
 const apiVersion = '3';
-const postUrl = 'https://ads-api.reddit.com/api/v' + apiVersion + '/pixels/' + enc(data.accountId) + '/conversion_events';
+const postUrl =
+  'https://ads-api.reddit.com/api/v' +
+  apiVersion +
+  '/pixels/' +
+  enc(data.accountId) +
+  '/conversion_events';
 const postBody = mapEvent(eventData, data);
 sendRedditRequest(postUrl, postBody);
 
@@ -53,7 +58,8 @@ if (data.useOptimisticScenario) {
 
 function sendRedditRequest(postUrl, postBody) {
   const eventType = postBody.data.events[0].type;
-  const eventName = eventType.tracking_type === 'CUSTOM' ? eventType.custom_event_name : eventType.tracking_type;
+  const eventName =
+    eventType.tracking_type === 'CUSTOM' ? eventType.custom_event_name : eventType.tracking_type;
 
   log({
     Name: 'Reddit',
@@ -140,7 +146,9 @@ function mapEvent(eventData, data) {
   if (eventAt) {
     const timestampMillisRegex = createRegex('^[0-9]+$');
     // Retrocompatibility v2 -> v3
-    mappedData.event_at = testRegex(timestampMillisRegex, makeString(eventAt)) ? makeInteger(eventAt) : convertISOToTimeMs(eventAt);
+    mappedData.event_at = testRegex(timestampMillisRegex, makeString(eventAt))
+      ? makeInteger(eventAt)
+      : convertISOToTimeMs(eventAt);
   }
 
   if (data.clickId) {
@@ -162,14 +170,17 @@ function mapEvent(eventData, data) {
 
 function addPropertiesData(eventData, mappedData) {
   if (eventData.event_id) mappedData.metadata.conversion_id = makeString(eventData.event_id);
-  else if (eventData.transaction_id) mappedData.metadata.conversion_id = makeString(eventData.transaction_id);
+  else if (eventData.transaction_id)
+    mappedData.metadata.conversion_id = makeString(eventData.transaction_id);
 
   if (eventData.currency) mappedData.metadata.currency = eventData.currency;
   if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
 
   if (isValidValue(eventData.value)) mappedData.metadata.value = makeNumber(eventData.value);
-  else if (isValidValue(eventData['x-ga-mp1-ev'])) mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-ev']);
-  else if (isValidValue(eventData['x-ga-mp1-tr'])) mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-tr']);
+  else if (isValidValue(eventData['x-ga-mp1-ev']))
+    mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-ev']);
+  else if (isValidValue(eventData['x-ga-mp1-tr']))
+    mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-tr']);
 
   if (eventData.products) mappedData.metadata.products = eventData.products;
   else if (eventData.items && eventData.items[0]) {
@@ -188,6 +199,11 @@ function addPropertiesData(eventData, mappedData) {
       if (product.content_name) item.name = product.content_name;
       else if (product.name) item.name = product.name;
       else if (product.item_name) item.name = product.item_name;
+
+      if (product.price) item.item_price = product.price;
+      else if (product.item_price) item.item_price = product.item_price;
+
+      if (product.quantity) item.quantity = product.quantity;
 
       mappedData.metadata.products.push(item);
     });
@@ -279,7 +295,11 @@ function addUserData(eventData, mappedData) {
   if (data.userDataList) {
     data.userDataList.forEach((userProperty) => {
       // Retrocompatibility v2 -> v3
-      if ((userProperty.name === 'opt_out' || userProperty.name.indexOf('data_processing_options' !== -1)) && userProperty.value) {
+      if (
+        (userProperty.name === 'opt_out' ||
+          userProperty.name.indexOf('data_processing_options' !== -1)) &&
+        userProperty.value
+      ) {
         mappedData.user.data_processing_options = mappedData.user.data_processing_options || {
           modes: ['LDU']
         };
@@ -398,7 +418,10 @@ function getUrl(eventData) {
 }
 
 function getCookieAutoDomain() {
-  return computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) || 'auto';
+  return (
+    computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) ||
+    'auto'
+  );
 }
 
 function enc(data) {
@@ -480,7 +503,10 @@ function logToBigQuery(dataToLog) {
 
 function determinateIsLoggingEnabled() {
   const containerVersion = getContainerVersion();
-  const isDebug = !!(containerVersion && (containerVersion.debugMode || containerVersion.previewMode));
+  const isDebug = !!(
+    containerVersion &&
+    (containerVersion.debugMode || containerVersion.previewMode)
+  );
 
   if (!data.logType) {
     return isDebug;
