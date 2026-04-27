@@ -1,6 +1,8 @@
 homepage: 'https://stape.io/'
 documentation: 'https://github.com/stape-io/reddit-tag'
 versions:
+  - sha: 3e4151b84948c14a25c5ddd34a2a666b03cc97d4
+    changeNotes: Fix price key and force product ID to string.
   - sha: d15962574cf991e9f10e09cd315ef0e8073beb30
     changeNotes: |2
       BREAKING CHANGES! CAREFULLY REVIEW ALL YOUR REDDIT TAGS.
