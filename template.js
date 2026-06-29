@@ -1,17 +1,14 @@
-const BigQuery = require('BigQuery');
 const computeEffectiveTldPlusOne = require('computeEffectiveTldPlusOne');
 const createRegex = require('createRegex');
 const decodeUriComponent = require('decodeUriComponent');
 const encodeUriComponent = require('encodeUriComponent');
 const getAllEventData = require('getAllEventData');
-const getContainerVersion = require('getContainerVersion');
 const getCookieValues = require('getCookieValues');
 const getEventData = require('getEventData');
 const getRequestHeader = require('getRequestHeader');
 const getTimestampMillis = require('getTimestampMillis');
 const getType = require('getType');
 const JSON = require('JSON');
-const logToConsole = require('logToConsole');
 const makeInteger = require('makeInteger');
 const makeNumber = require('makeNumber');
 const makeString = require('makeString');
@@ -23,30 +20,16 @@ const testRegex = require('testRegex');
 /*==============================================================================
 ==============================================================================*/
 
+const API_VERSION = '3';
 const eventData = getAllEventData();
 
-if (!isConsentGivenOrNotRequired(data, eventData)) {
-  return data.gtmOnSuccess();
-}
+if (shouldExitEarly(data, eventData)) return;
 
-const url = getUrl(eventData);
-if (url && url.lastIndexOf('https://gtm-msr.appspot.com/', 0) === 0) {
-  return data.gtmOnSuccess();
-}
+const rdtcid = getClickId(eventData);
+handleClickIdCookie(rdtcid);
 
-const deprecatedCookie = getCookieValues('rdt_cid')[0];
-let rdtcid = deprecatedCookie || getCookieValues('_rdt_cid')[0] || eventData.rdt_cid;
-handleRedditCookie(url);
-
-const apiVersion = '3';
-const postUrl =
-  'https://ads-api.reddit.com/api/v' +
-  apiVersion +
-  '/pixels/' +
-  enc(data.accountId) +
-  '/conversion_events';
-const postBody = mapEvent(eventData, data);
-sendRedditRequest(postUrl, postBody);
+const postBody = mapEvent(data, eventData, rdtcid);
+sendRedditRequest(postBody);
 
 if (data.useOptimisticScenario) {
   return data.gtmOnSuccess();
@@ -56,38 +39,19 @@ if (data.useOptimisticScenario) {
   Vendor related functions
 ==============================================================================*/
 
-function sendRedditRequest(postUrl, postBody) {
-  const eventType = postBody.data.events[0].type;
-  const eventName =
-    eventType.tracking_type === 'CUSTOM' ? eventType.custom_event_name : eventType.tracking_type;
-
-  log({
-    Name: 'Reddit',
-    Type: 'Request',
-    EventName: eventName,
-    RequestMethod: 'POST',
-    RequestUrl: postUrl,
-    RequestBody: postBody
-  });
+function sendRedditRequest(postBody) {
+  const requestUrl =
+    'https://ads-api.reddit.com/api/v' +
+    API_VERSION +
+    '/pixels/' +
+    enc(data.accountId) +
+    '/conversion_events';
 
   sendHttpRequest(
-    postUrl,
+    requestUrl,
     (statusCode, headers, body) => {
-      log({
-        Name: 'Reddit',
-        Type: 'Response',
-        EventName: eventName,
-        ResponseStatusCode: statusCode,
-        ResponseHeaders: headers,
-        ResponseBody: body
-      });
-
       if (!data.useOptimisticScenario) {
-        if (statusCode >= 200 && statusCode < 400) {
-          data.gtmOnSuccess();
-        } else {
-          data.gtmOnFailure();
-        }
+        return statusCode >= 200 && statusCode < 400 ? data.gtmOnSuccess() : data.gtmOnFailure();
       }
     },
     {
@@ -101,7 +65,26 @@ function sendRedditRequest(postUrl, postBody) {
   );
 }
 
-function handleRedditCookie(url) {
+function getClickId(eventData) {
+  let rdtcid =
+    getCookieValues('rdt_cid')[0] /* Deprecated cookie */ ||
+    getCookieValues('_rdt_cid')[0] ||
+    eventData._rdt_cid ||
+    eventData.rdt_cid;
+
+  const url = getUrl(eventData);
+  if (url) {
+    const urlParsed = parseUrl(url);
+    if (urlParsed && urlParsed.searchParams.rdt_cid) {
+      rdtcid = decodeUriComponent(urlParsed.searchParams.rdt_cid);
+    }
+  }
+
+  return rdtcid;
+}
+
+function handleClickIdCookie(rdtcid) {
+  const deprecatedCookie = getCookieValues('rdt_cid')[0];
   if (deprecatedCookie) {
     setCookie('rdt_cid', '', {
       domain: getCookieAutoDomain(),
@@ -111,14 +94,6 @@ function handleRedditCookie(url) {
       'max-age': 0,
       httpOnly: false
     });
-  }
-
-  if (url) {
-    const urlParsed = parseUrl(url);
-
-    if (urlParsed && urlParsed.searchParams.rdt_cid) {
-      rdtcid = decodeUriComponent(urlParsed.searchParams.rdt_cid);
-    }
   }
 
   if (rdtcid) {
@@ -133,11 +108,14 @@ function handleRedditCookie(url) {
   }
 }
 
-function mapEvent(eventData, data) {
+function mapEvent(data, eventData, rdtcid) {
+  const autoMapEnabled = data.hasOwnProperty('autoMapCommonEventData')
+    ? data.autoMapCommonEventData
+    : true; // To avoid a breaking change.
   let mappedData = {
     type: getEventType(eventData, data),
-    event_at: getTimestampMillis(),
-    action_source: 'WEBSITE',
+    event_at: autoMapEnabled ? getTimestampMillis() : undefined,
+    action_source: data.actionSource || 'WEBSITE',
     metadata: {},
     user: {}
   };
@@ -151,10 +129,14 @@ function mapEvent(eventData, data) {
       : convertISOToTimeMs(eventAt);
   }
 
-  if (data.clickId) {
-    mappedData.click_id = data.clickId;
-  } else if (rdtcid) {
-    mappedData.click_id = rdtcid;
+  const clickId = data.clickId || (autoMapEnabled ? rdtcid : undefined);
+  if (clickId) {
+    mappedData.click_id = clickId;
+  }
+
+  if (mappedData.action_source === 'WEBSITE') {
+    const eventSourceUrl = data.eventSourceUrl || (autoMapEnabled ? getUrl(eventData) : undefined);
+    if (eventSourceUrl) mappedData.event_source_url = eventSourceUrl;
   }
 
   mappedData = addUserData(eventData, mappedData);
@@ -169,44 +151,54 @@ function mapEvent(eventData, data) {
 }
 
 function addPropertiesData(eventData, mappedData) {
-  if (eventData.event_id) mappedData.metadata.conversion_id = makeString(eventData.event_id);
-  else if (eventData.transaction_id)
-    mappedData.metadata.conversion_id = makeString(eventData.transaction_id);
+  const autoMapEnabled = data.hasOwnProperty('autoMapServerEventData')
+    ? data.autoMapServerEventData
+    : true; // To avoid a breaking change.
 
-  if (eventData.currency) mappedData.metadata.currency = eventData.currency;
-  if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
+  if (autoMapEnabled) {
+    const eventId = eventData.event_id || eventData.transaction_id;
+    if (eventId) mappedData.metadata.conversion_id = makeString(eventId);
 
-  if (isValidValue(eventData.value)) mappedData.metadata.value = makeNumber(eventData.value);
-  else if (isValidValue(eventData['x-ga-mp1-ev']))
-    mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-ev']);
-  else if (isValidValue(eventData['x-ga-mp1-tr']))
-    mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-tr']);
+    if (eventData.currency) mappedData.metadata.currency = eventData.currency;
+    if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
 
-  if (eventData.products) mappedData.metadata.products = eventData.products;
-  else if (eventData.items && eventData.items[0]) {
-    mappedData.metadata.products = [];
+    const value = eventData.value || eventData['x-ga-mp1-ev'] || eventData['x-ga-mp1-tr'];
+    if (isValidValue(value)) mappedData.metadata.value = makeNumber(value);
 
-    eventData.items.forEach((product) => {
-      let item = {};
+    let items;
+    if (getType(eventData.items) === 'array' && eventData.items.length) items = eventData.items;
+    else if (
+      getType(eventData.ecommerce) === 'object' &&
+      getType(eventData.ecommerce.items) === 'array' &&
+      eventData.ecommerce.items.length
+    ) {
+      items = eventData.ecommerce.items;
+    }
 
-      if (product.item_id) item.id = makeString(product.item_id);
-      else if (product.id) item.id = makeString(product.id);
+    if (eventData.products) mappedData.metadata.products = eventData.products;
+    else if (items && items[0]) {
+      mappedData.metadata.products = [];
 
-      if (product.content_category) item.category = product.content_category;
-      else if (product.category) item.category = product.category;
-      else if (product.item_category) item.category = product.item_category;
+      items.forEach((product) => {
+        const item = {};
 
-      if (product.content_name) item.name = product.content_name;
-      else if (product.name) item.name = product.name;
-      else if (product.item_name) item.name = product.item_name;
+        const itemId = product.item_id || product.id;
+        if (itemId) item.id = makeString(itemId);
 
-      if (product.price) item.item_price = product.price;
-      else if (product.item_price) item.item_price = product.item_price;
+        const category = product.content_category || product.category || product.item_category;
+        if (category) item.category = category;
 
-      if (product.quantity) item.quantity = product.quantity;
+        const name = product.content_name || product.name || product.item_name;
+        if (name) item.name = name;
 
-      mappedData.metadata.products.push(item);
-    });
+        const price = product.price || product.item_price;
+        if (price) item.item_price = price;
+
+        if (product.quantity) item.quantity = product.quantity;
+
+        mappedData.metadata.products.push(item);
+      });
+    }
   }
 
   if (data.serverEventDataList) {
@@ -228,68 +220,75 @@ function addPropertiesData(eventData, mappedData) {
 }
 
 function addUserData(eventData, mappedData) {
-  const uuid = getUUIDFromCookie() || eventData.rdt_uuid;
-  let userEventData = {};
+  const autoMapEnabled = data.hasOwnProperty('autoMapUserData') ? data.autoMapUserData : true; // To avoid a breaking change.
 
-  if (getType(eventData.user_data) === 'object') {
-    userEventData = eventData.user_data || eventData.user_properties || eventData.user;
-  }
+  if (autoMapEnabled) {
+    let userEventData = {};
 
-  if (uuid) mappedData.user.uuid = uuid;
+    if (getType(eventData.user_data) === 'object') {
+      userEventData = eventData.user_data || eventData.user_properties || eventData.user;
+    }
 
-  const platform = eventData['x-ga-platform'];
+    const uuid = getUUIDFromCookie() || eventData._rdt_uuid || eventData.rdt_uuid;
+    if (uuid) mappedData.user.uuid = uuid;
 
-  if (eventData.aaid) mappedData.user.aaid = eventData.aaid;
-  else if (userEventData.aaid) mappedData.user.aaid = userEventData.aaid;
-  else if (platform === 'android' && eventData['x-ga-resettable_device_id']) {
-    mappedData.user.aaid = eventData['x-ga-resettable_device_id'];
-  }
+    const platform = eventData['x-ga-platform'];
 
-  if (eventData.idfa) mappedData.user.idfa = eventData.idfa;
-  else if (userEventData.idfa) mappedData.user.idfa = userEventData.idfa;
-  else if (platform === 'ios' && eventData['x-ga-resettable_device_id']) {
-    mappedData.user.idfa = eventData['x-ga-resettable_device_id'];
-  }
+    const aaid =
+      eventData.aaid ||
+      userEventData.aaid ||
+      (platform === 'android' ? eventData['x-ga-resettable_device_id'] : undefined);
+    if (aaid && aaid !== '00000000-0000-0000-0000-000000000000') mappedData.user.aaid = aaid;
 
-  if (eventData.email) mappedData.user.email = eventData.email;
-  else if (eventData.email_address) mappedData.user.email = eventData.email_address;
-  else if (userEventData.email) mappedData.user.email = userEventData.email;
-  else if (userEventData.email_address) mappedData.user.email = userEventData.email_address;
-  else if (getCookieValues('_rdt_em')[0]) mappedData.user.email = getCookieValues('_rdt_em')[0];
+    const idfa =
+      eventData.idfa ||
+      userEventData.idfa ||
+      (platform === 'ios' ? eventData['x-ga-resettable_device_id'] : undefined);
+    if (idfa && idfa !== '00000000-0000-0000-0000-000000000000') mappedData.user.idfa = idfa;
 
-  if (eventData.phone) mappedData.user.phone_number = eventData.phone;
-  else if (eventData.phone_number) mappedData.user.phone_number = eventData.phone_number;
-  else if (userEventData.phone) mappedData.user.phone_number = userEventData.phone;
-  else if (userEventData.phone_number) mappedData.user.phone_number = userEventData.phone_number;
+    const email =
+      eventData.email ||
+      eventData.email_address ||
+      userEventData.email ||
+      userEventData.email_address ||
+      getCookieValues('_rdt_em')[0];
+    if (email) mappedData.user.email = email;
 
-  if (eventData.external_id) mappedData.user.external_id = eventData.external_id;
-  else if (eventData.user_id) mappedData.user.external_id = eventData.user_id;
-  else if (eventData.userId) mappedData.user.external_id = eventData.userId;
-  else if (userEventData.external_id) mappedData.user.external_id = userEventData.external_id;
+    const phone =
+      eventData.phone ||
+      eventData.phone_number ||
+      userEventData.phone ||
+      userEventData.phone_number ||
+      getCookieValues('_rdt_ph')[0];
+    if (phone) mappedData.user.phone_number = phone;
 
-  if (eventData.ip_override) mappedData.user.ip_address = eventData.ip_override;
-  else if (eventData.ip_address) mappedData.user.ip_address = eventData.ip_address;
-  else if (eventData.ip) mappedData.user.ip_address = eventData.ip;
+    const externalId =
+      eventData.external_id || eventData.user_id || eventData.userId || userEventData.external_id;
+    if (externalId) mappedData.user.external_id = externalId;
 
-  // Retrocompatibility v2 -> v3
-  if (eventData.opt_out) {
-    mappedData.user.data_processing_options = {
-      modes: ['LDU']
-    };
-  }
+    const ip = eventData.ip_override || eventData.ip_address || eventData.ip;
+    if (ip) mappedData.user.ip_address = ip;
 
-  if (eventData.user_agent) mappedData.user.user_agent = eventData.user_agent;
+    // Retrocompatibility v2 -> v3
+    if (eventData.opt_out) {
+      mappedData.user.data_processing_options = {
+        modes: ['LDU']
+      };
+    }
 
-  if (eventData.viewport_size && eventData.viewport_size.split('x').length === 2) {
-    mappedData.user.screen_dimensions = {
-      width: makeInteger(eventData.viewport_size.split('x')[0]),
-      height: makeInteger(eventData.viewport_size.split('x')[1])
-    };
-  } else if (eventData.height && eventData.width) {
-    mappedData.user.screen_dimensions = {
-      height: makeInteger(eventData.height),
-      width: makeInteger(eventData.width)
-    };
+    if (eventData.user_agent) mappedData.user.user_agent = eventData.user_agent;
+
+    if (eventData.viewport_size && eventData.viewport_size.split('x').length === 2) {
+      mappedData.user.screen_dimensions = {
+        width: makeInteger(eventData.viewport_size.split('x')[0]),
+        height: makeInteger(eventData.viewport_size.split('x')[1])
+      };
+    } else if (eventData.height && eventData.width) {
+      mappedData.user.screen_dimensions = {
+        height: makeInteger(eventData.height),
+        width: makeInteger(eventData.width)
+      };
+    }
   }
 
   if (data.userDataList) {
@@ -297,7 +296,7 @@ function addUserData(eventData, mappedData) {
       // Retrocompatibility v2 -> v3
       if (
         (userProperty.name === 'opt_out' ||
-          userProperty.name.indexOf('data_processing_options' !== -1)) &&
+          userProperty.name.indexOf('data_processing_options') !== -1) &&
         userProperty.value
       ) {
         mappedData.user.data_processing_options = mappedData.user.data_processing_options || {
@@ -328,7 +327,7 @@ function getUUIDFromCookie() {
     if (!current) continue;
     if (!oldest || current.timestamp < oldest.timestamp) oldest = current;
   }
-  return oldest && oldest.uuid;
+  return oldest && oldest.uuid ? oldest.uuid : null;
 }
 
 function getUUIDAndTimestamp(uuidWithTimestamp) {
@@ -417,6 +416,19 @@ function getUrl(eventData) {
   return eventData.page_location || eventData.page_referrer || getRequestHeader('referer');
 }
 
+function shouldExitEarly(data, eventData) {
+  if (!isConsentGivenOrNotRequired(data, eventData)) {
+    data.gtmOnSuccess();
+    return true;
+  }
+
+  const url = getUrl(eventData);
+  if (url && url.lastIndexOf('https://gtm-msr.appspot.com/', 0) === 0) {
+    data.gtmOnSuccess();
+    return true;
+  }
+}
+
 function getCookieAutoDomain() {
   return (
     computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) ||
@@ -425,12 +437,13 @@ function getCookieAutoDomain() {
 }
 
 function enc(data) {
-  return encodeUriComponent(data || '');
+  if (['null', 'undefined'].indexOf(getType(data)) !== -1) data = '';
+  return encodeUriComponent(makeString(data));
 }
 
 function isValidValue(value) {
   const valueType = getType(value);
-  return valueType !== 'null' && valueType !== 'undefined' && value !== '';
+  return valueType !== 'null' && valueType !== 'undefined' && value !== '' && value === value;
 }
 
 function isConsentGivenOrNotRequired(data, eventData) {
@@ -438,94 +451,6 @@ function isConsentGivenOrNotRequired(data, eventData) {
   if (eventData.consent_state) return !!eventData.consent_state.ad_storage;
   const xGaGcs = eventData['x-ga-gcs'] || ''; // x-ga-gcs is a string like "G110"
   return xGaGcs[2] === '1';
-}
-
-function log(rawDataToLog) {
-  const logDestinationsHandlers = {};
-  if (determinateIsLoggingEnabled()) logDestinationsHandlers.console = logConsole;
-  if (determinateIsLoggingEnabledForBigQuery()) logDestinationsHandlers.bigQuery = logToBigQuery;
-
-  rawDataToLog.TraceId = getRequestHeader('trace-id');
-
-  const keyMappings = {
-    // No transformation for Console is needed.
-    bigQuery: {
-      Name: 'tag_name',
-      Type: 'type',
-      TraceId: 'trace_id',
-      EventName: 'event_name',
-      RequestMethod: 'request_method',
-      RequestUrl: 'request_url',
-      RequestBody: 'request_body',
-      ResponseStatusCode: 'response_status_code',
-      ResponseHeaders: 'response_headers',
-      ResponseBody: 'response_body'
-    }
-  };
-
-  for (const logDestination in logDestinationsHandlers) {
-    const handler = logDestinationsHandlers[logDestination];
-    if (!handler) continue;
-
-    const mapping = keyMappings[logDestination];
-    const dataToLog = mapping ? {} : rawDataToLog;
-
-    if (mapping) {
-      for (const key in rawDataToLog) {
-        const mappedKey = mapping[key] || key;
-        dataToLog[mappedKey] = rawDataToLog[key];
-      }
-    }
-
-    handler(dataToLog);
-  }
-}
-
-function logConsole(dataToLog) {
-  logToConsole(JSON.stringify(dataToLog));
-}
-
-function logToBigQuery(dataToLog) {
-  const connectionInfo = {
-    projectId: data.logBigQueryProjectId,
-    datasetId: data.logBigQueryDatasetId,
-    tableId: data.logBigQueryTableId
-  };
-
-  dataToLog.timestamp = getTimestampMillis();
-
-  ['request_body', 'response_headers', 'response_body'].forEach((p) => {
-    dataToLog[p] = JSON.stringify(dataToLog[p]);
-  });
-
-  BigQuery.insert(connectionInfo, [dataToLog], { ignoreUnknownValues: true });
-}
-
-function determinateIsLoggingEnabled() {
-  const containerVersion = getContainerVersion();
-  const isDebug = !!(
-    containerVersion &&
-    (containerVersion.debugMode || containerVersion.previewMode)
-  );
-
-  if (!data.logType) {
-    return isDebug;
-  }
-
-  if (data.logType === 'no') {
-    return false;
-  }
-
-  if (data.logType === 'debug') {
-    return isDebug;
-  }
-
-  return data.logType === 'always';
-}
-
-function determinateIsLoggingEnabledForBigQuery() {
-  if (data.bigQueryLogType === 'no') return false;
-  return data.bigQueryLogType === 'always';
 }
 
 function convertISOToTimeMs(dateTime) {
