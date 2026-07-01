@@ -26,7 +26,7 @@ ___INFO___
     "displayName": "stape.io",
     "thumbnail": "data:image/png;base64,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\u003d"
   },
-  "description": "Tag that send the event data from the GA4/Data Clients to Reddit Conversion API.",
+  "description": "Tag that send the event data from the GA4 Client and Data Client to Reddit Conversion API.",
   "containerContexts": [
     "SERVER"
   ]
@@ -151,6 +151,32 @@ ___TEMPLATE_PARAMETERS___
         ]
       },
       {
+        "type": "SELECT",
+        "name": "actionSource",
+        "displayName": "Action Source",
+        "selectItems": [
+          {
+            "value": "WEBSITE",
+            "displayValue": "Website"
+          },
+          {
+            "value": "APP",
+            "displayValue": "App"
+          },
+          {
+            "value": "PHYSICAL_STORE",
+            "displayValue": "Physical Store"
+          },
+          {
+            "value": "OTHER",
+            "displayValue": "Other"
+          }
+        ],
+        "simpleValueType": true,
+        "help": "The channel where the conversion happened. Used for \u003ca href\u003d\"https://business.reddithelp.com/s/article/omni-attribution\"\u003eOmnichannel Attribution\u003c/a\u003e and \u003ca href\u003d\"https://business.reddithelp.com/s/article/Custom-Columns#supported-metrics\"\u003esource-level conversion metrics\u003c/a\u003e in reporting.",
+        "defaultValue": "WEBSITE"
+      },
+      {
         "type": "TEXT",
         "name": "testId",
         "displayName": "Test ID",
@@ -173,6 +199,14 @@ ___TEMPLATE_PARAMETERS___
     "type": "GROUP",
     "subParams": [
       {
+        "type": "CHECKBOX",
+        "name": "autoMapCommonEventData",
+        "checkboxText": "Automap Common Event Data",
+        "simpleValueType": true,
+        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the fields below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eEvent At:\u003c/b\u003e current server timestamp\u003c/li\u003e \u003cli\u003e\u003cb\u003eClick ID:\u003c/b\u003e \u003ci\u003erdt_cid\u003c/i\u003e URL parameter, \u003ci\u003erdt_cid\u003c/i\u003e cookie (deprecated), \u003ci\u003e_rdt_cid\u003c/i\u003e cookie, \u003ci\u003eeventData.rdt_cid\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eEvent Source URL:\u003c/b\u003e \u003ci\u003eeventData.page_location\u003c/i\u003e (Website only)\u003c/li\u003e \u003c/ul\u003e",
+        "defaultValue": true
+      },
+      {
         "type": "TEXT",
         "name": "eventAt",
         "displayName": "Event At",
@@ -184,7 +218,26 @@ ___TEMPLATE_PARAMETERS___
         "name": "clickId",
         "displayName": "Click ID",
         "simpleValueType": true,
-        "help": "The Reddit-generated id associated with a single ad click."
+        "help": "The Reddit-generated ID (\u003ci\u003erdt_cid\u003c/i\u003e) associated with a single ad click."
+      },
+      {
+        "type": "TEXT",
+        "name": "eventSourceUrl",
+        "displayName": "Event Source URL",
+        "simpleValueType": true,
+        "help": "The URL where the conversion event occurred.",
+        "enablingConditions": [
+          {
+            "paramName": "actionSource",
+            "paramValue": "WEBSITE",
+            "type": "EQUALS"
+          },
+          {
+            "paramName": "actionSource",
+            "paramValue": "",
+            "type": "NOT_PRESENT"
+          }
+        ]
       }
     ]
   },
@@ -194,6 +247,14 @@ ___TEMPLATE_PARAMETERS___
     "groupStyle": "ZIPPY_CLOSED",
     "type": "GROUP",
     "subParams": [
+      {
+        "type": "CHECKBOX",
+        "name": "autoMapServerEventData",
+        "checkboxText": "Automap Server Event Data",
+        "simpleValueType": true,
+        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the table below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eConversion ID:\u003c/b\u003e \u003ci\u003eeventData.event_id\u003c/i\u003e, \u003ci\u003eeventData.transaction_id\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eCurrency:\u003c/b\u003e \u003ci\u003eeventData.currency\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eItem Count:\u003c/b\u003e \u003ci\u003eeventData.item_count\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eValue:\u003c/b\u003e \u003ci\u003eeventData.value\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-mp1-ev\u0027]\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-mp1-tr\u0027]\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eProducts:\u003c/b\u003e \u003ci\u003eeventData.products\u003c/i\u003e, mapped from \u003ci\u003eeventData.items[]\u003c/i\u003e, \u003ci\u003eeventData.ecommerce.items[]\u003c/i\u003e\u003c/li\u003e \u003c/ul\u003e",
+        "defaultValue": true
+      },
       {
         "name": "serverEventDataList",
         "simpleTableColumns": [
@@ -255,6 +316,14 @@ ___TEMPLATE_PARAMETERS___
     "groupStyle": "ZIPPY_CLOSED",
     "type": "GROUP",
     "subParams": [
+      {
+        "type": "CHECKBOX",
+        "name": "autoMapUserData",
+        "checkboxText": "Automap User Data",
+        "simpleValueType": true,
+        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the table below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eEmail:\u003c/b\u003e \u003ci\u003eeventData.email\u003c/i\u003e, \u003ci\u003eeventData.email_address\u003c/i\u003e, \u003ci\u003eeventData.user_data.email\u003c/i\u003e, \u003ci\u003eeventData.user_data.email_address\u003c/i\u003e, \u003ci\u003e_rdt_em\u003c/i\u003e cookie\u003c/li\u003e \u003cli\u003e\u003cb\u003ePhone Number:\u003c/b\u003e \u003ci\u003eeventData.phone\u003c/i\u003e, \u003ci\u003eeventData.phone_number\u003c/i\u003e, \u003ci\u003eeventData.user_data.phone\u003c/i\u003e, \u003ci\u003eeventData.user_data.phone_number\u003c/i\u003e, \u003ci\u003e_rdt_ph\u003c/i\u003e cookie\u003c/li\u003e \u003cli\u003e\u003cb\u003eExternal ID:\u003c/b\u003e \u003ci\u003eeventData.external_id\u003c/i\u003e, \u003ci\u003eeventData.user_id\u003c/i\u003e, \u003ci\u003eeventData.userId\u003c/i\u003e, \u003ci\u003eeventData.user_data.external_id\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eIP Address:\u003c/b\u003e \u003ci\u003eeventData.ip_override\u003c/i\u003e, \u003ci\u003eeventData.ip_address\u003c/i\u003e, \u003ci\u003eeventData.ip\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eUser Agent:\u003c/b\u003e \u003ci\u003eeventData.user_agent\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eScreen Dimensions:\u003c/b\u003e \u003ci\u003eeventData.viewport_size\u003c/i\u003e (WxH format), \u003ci\u003eeventData.width\u003c/i\u003e + \u003ci\u003eeventData.height\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eUUID (_rdt_uuid first party cookie):\u003c/b\u003e \u003ci\u003e_rdt_uuid\u003c/i\u003e cookie, \u003ci\u003eeventData.rdt_uuid\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eAndroid GAID/AAID:\u003c/b\u003e \u003ci\u003eeventData.aaid\u003c/i\u003e, \u003ci\u003eeventData.user_data.aaid\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-resettable_device_id\u0027]\u003c/i\u003e (Android) — null UUIDs are ignored\u003c/li\u003e \u003cli\u003e\u003cb\u003eiOS IDFA:\u003c/b\u003e \u003ci\u003eeventData.idfa\u003c/i\u003e, \u003ci\u003eeventData.user_data.idfa\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-resettable_device_id\u0027]\u003c/i\u003e (iOS) — null UUIDs are ignored\u003c/li\u003e \u003c/ul\u003e",
+        "defaultValue": true
+      },
       {
         "name": "userDataList",
         "simpleTableColumns": [
@@ -359,121 +428,23 @@ ___TEMPLATE_PARAMETERS___
         "defaultValue": "optional"
       }
     ]
-  },
-  {
-    "displayName": "Logs Settings",
-    "name": "logsGroup",
-    "groupStyle": "ZIPPY_CLOSED",
-    "type": "GROUP",
-    "subParams": [
-      {
-        "type": "RADIO",
-        "name": "logType",
-        "radioItems": [
-          {
-            "value": "no",
-            "displayValue": "Do not log"
-          },
-          {
-            "value": "debug",
-            "displayValue": "Log to console during debug and preview"
-          },
-          {
-            "value": "always",
-            "displayValue": "Always log to console"
-          }
-        ],
-        "simpleValueType": true,
-        "defaultValue": "debug"
-      }
-    ]
-  },
-  {
-    "displayName": "BigQuery Logs Settings",
-    "name": "bigQueryLogsGroup",
-    "groupStyle": "ZIPPY_CLOSED",
-    "type": "GROUP",
-    "subParams": [
-      {
-        "type": "RADIO",
-        "name": "bigQueryLogType",
-        "radioItems": [
-          {
-            "value": "no",
-            "displayValue": "Do not log to BigQuery"
-          },
-          {
-            "value": "always",
-            "displayValue": "Log to BigQuery"
-          }
-        ],
-        "simpleValueType": true,
-        "defaultValue": "no"
-      },
-      {
-        "type": "GROUP",
-        "name": "logsBigQueryConfigGroup",
-        "groupStyle": "NO_ZIPPY",
-        "subParams": [
-          {
-            "type": "TEXT",
-            "name": "logBigQueryProjectId",
-            "displayName": "BigQuery Project ID",
-            "simpleValueType": true,
-            "help": "Optional.  \u003cbr\u003e\u003cbr\u003e  If omitted, it will be retrieved from the environment variable \u003cI\u003eGOOGLE_CLOUD_PROJECT\u003c/i\u003e where the server container is running. If the server container is running on Google Cloud, \u003cI\u003eGOOGLE_CLOUD_PROJECT\u003c/i\u003e will already be set to the Google Cloud project\u0027s ID."
-          },
-          {
-            "type": "TEXT",
-            "name": "logBigQueryDatasetId",
-            "displayName": "BigQuery Dataset ID",
-            "simpleValueType": true,
-            "valueValidators": [
-              {
-                "type": "NON_EMPTY"
-              }
-            ]
-          },
-          {
-            "type": "TEXT",
-            "name": "logBigQueryTableId",
-            "displayName": "BigQuery Table ID",
-            "simpleValueType": true,
-            "valueValidators": [
-              {
-                "type": "NON_EMPTY"
-              }
-            ]
-          }
-        ],
-        "enablingConditions": [
-          {
-            "paramName": "bigQueryLogType",
-            "paramValue": "always",
-            "type": "EQUALS"
-          }
-        ]
-      }
-    ]
   }
 ]
 
 
 ___SANDBOXED_JS_FOR_SERVER___
 
-const BigQuery = require('BigQuery');
 const computeEffectiveTldPlusOne = require('computeEffectiveTldPlusOne');
 const createRegex = require('createRegex');
 const decodeUriComponent = require('decodeUriComponent');
 const encodeUriComponent = require('encodeUriComponent');
 const getAllEventData = require('getAllEventData');
-const getContainerVersion = require('getContainerVersion');
 const getCookieValues = require('getCookieValues');
 const getEventData = require('getEventData');
 const getRequestHeader = require('getRequestHeader');
 const getTimestampMillis = require('getTimestampMillis');
 const getType = require('getType');
 const JSON = require('JSON');
-const logToConsole = require('logToConsole');
 const makeInteger = require('makeInteger');
 const makeNumber = require('makeNumber');
 const makeString = require('makeString');
@@ -485,30 +456,16 @@ const testRegex = require('testRegex');
 /*==============================================================================
 ==============================================================================*/
 
+const API_VERSION = '3';
 const eventData = getAllEventData();
 
-if (!isConsentGivenOrNotRequired(data, eventData)) {
-  return data.gtmOnSuccess();
-}
+if (shouldExitEarly(data, eventData)) return;
 
-const url = getUrl(eventData);
-if (url && url.lastIndexOf('https://gtm-msr.appspot.com/', 0) === 0) {
-  return data.gtmOnSuccess();
-}
+const rdtcid = getClickId(eventData);
+handleClickIdCookie(rdtcid);
 
-const deprecatedCookie = getCookieValues('rdt_cid')[0];
-let rdtcid = deprecatedCookie || getCookieValues('_rdt_cid')[0] || eventData.rdt_cid;
-handleRedditCookie(url);
-
-const apiVersion = '3';
-const postUrl =
-  'https://ads-api.reddit.com/api/v' +
-  apiVersion +
-  '/pixels/' +
-  enc(data.accountId) +
-  '/conversion_events';
-const postBody = mapEvent(eventData, data);
-sendRedditRequest(postUrl, postBody);
+const postBody = mapEvent(data, eventData, rdtcid);
+sendRedditRequest(postBody);
 
 if (data.useOptimisticScenario) {
   return data.gtmOnSuccess();
@@ -518,38 +475,19 @@ if (data.useOptimisticScenario) {
   Vendor related functions
 ==============================================================================*/
 
-function sendRedditRequest(postUrl, postBody) {
-  const eventType = postBody.data.events[0].type;
-  const eventName =
-    eventType.tracking_type === 'CUSTOM' ? eventType.custom_event_name : eventType.tracking_type;
-
-  log({
-    Name: 'Reddit',
-    Type: 'Request',
-    EventName: eventName,
-    RequestMethod: 'POST',
-    RequestUrl: postUrl,
-    RequestBody: postBody
-  });
+function sendRedditRequest(postBody) {
+  const requestUrl =
+    'https://ads-api.reddit.com/api/v' +
+    API_VERSION +
+    '/pixels/' +
+    enc(data.accountId) +
+    '/conversion_events';
 
   sendHttpRequest(
-    postUrl,
+    requestUrl,
     (statusCode, headers, body) => {
-      log({
-        Name: 'Reddit',
-        Type: 'Response',
-        EventName: eventName,
-        ResponseStatusCode: statusCode,
-        ResponseHeaders: headers,
-        ResponseBody: body
-      });
-
       if (!data.useOptimisticScenario) {
-        if (statusCode >= 200 && statusCode < 400) {
-          data.gtmOnSuccess();
-        } else {
-          data.gtmOnFailure();
-        }
+        return statusCode >= 200 && statusCode < 400 ? data.gtmOnSuccess() : data.gtmOnFailure();
       }
     },
     {
@@ -563,7 +501,26 @@ function sendRedditRequest(postUrl, postBody) {
   );
 }
 
-function handleRedditCookie(url) {
+function getClickId(eventData) {
+  let rdtcid =
+    getCookieValues('rdt_cid')[0] /* Deprecated cookie */ ||
+    getCookieValues('_rdt_cid')[0] ||
+    eventData._rdt_cid ||
+    eventData.rdt_cid;
+
+  const url = getUrl(eventData);
+  if (url) {
+    const urlParsed = parseUrl(url);
+    if (urlParsed && urlParsed.searchParams.rdt_cid) {
+      rdtcid = decodeUriComponent(urlParsed.searchParams.rdt_cid);
+    }
+  }
+
+  return rdtcid;
+}
+
+function handleClickIdCookie(rdtcid) {
+  const deprecatedCookie = getCookieValues('rdt_cid')[0];
   if (deprecatedCookie) {
     setCookie('rdt_cid', '', {
       domain: getCookieAutoDomain(),
@@ -573,14 +530,6 @@ function handleRedditCookie(url) {
       'max-age': 0,
       httpOnly: false
     });
-  }
-
-  if (url) {
-    const urlParsed = parseUrl(url);
-
-    if (urlParsed && urlParsed.searchParams.rdt_cid) {
-      rdtcid = decodeUriComponent(urlParsed.searchParams.rdt_cid);
-    }
   }
 
   if (rdtcid) {
@@ -595,11 +544,14 @@ function handleRedditCookie(url) {
   }
 }
 
-function mapEvent(eventData, data) {
+function mapEvent(data, eventData, rdtcid) {
+  const autoMapEnabled = data.hasOwnProperty('autoMapCommonEventData')
+    ? data.autoMapCommonEventData
+    : true; // To avoid a breaking change.
   let mappedData = {
     type: getEventType(eventData, data),
-    event_at: getTimestampMillis(),
-    action_source: 'WEBSITE',
+    event_at: autoMapEnabled ? getTimestampMillis() : undefined,
+    action_source: data.actionSource || 'WEBSITE',
     metadata: {},
     user: {}
   };
@@ -613,10 +565,14 @@ function mapEvent(eventData, data) {
       : convertISOToTimeMs(eventAt);
   }
 
-  if (data.clickId) {
-    mappedData.click_id = data.clickId;
-  } else if (rdtcid) {
-    mappedData.click_id = rdtcid;
+  const clickId = data.clickId || (autoMapEnabled ? rdtcid : undefined);
+  if (clickId) {
+    mappedData.click_id = clickId;
+  }
+
+  if (mappedData.action_source === 'WEBSITE') {
+    const eventSourceUrl = data.eventSourceUrl || (autoMapEnabled ? getUrl(eventData) : undefined);
+    if (eventSourceUrl) mappedData.event_source_url = eventSourceUrl;
   }
 
   mappedData = addUserData(eventData, mappedData);
@@ -631,44 +587,54 @@ function mapEvent(eventData, data) {
 }
 
 function addPropertiesData(eventData, mappedData) {
-  if (eventData.event_id) mappedData.metadata.conversion_id = makeString(eventData.event_id);
-  else if (eventData.transaction_id)
-    mappedData.metadata.conversion_id = makeString(eventData.transaction_id);
+  const autoMapEnabled = data.hasOwnProperty('autoMapServerEventData')
+    ? data.autoMapServerEventData
+    : true; // To avoid a breaking change.
 
-  if (eventData.currency) mappedData.metadata.currency = eventData.currency;
-  if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
+  if (autoMapEnabled) {
+    const eventId = eventData.event_id || eventData.transaction_id;
+    if (eventId) mappedData.metadata.conversion_id = makeString(eventId);
 
-  if (isValidValue(eventData.value)) mappedData.metadata.value = makeNumber(eventData.value);
-  else if (isValidValue(eventData['x-ga-mp1-ev']))
-    mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-ev']);
-  else if (isValidValue(eventData['x-ga-mp1-tr']))
-    mappedData.metadata.value = makeNumber(eventData['x-ga-mp1-tr']);
+    if (eventData.currency) mappedData.metadata.currency = eventData.currency;
+    if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
 
-  if (eventData.products) mappedData.metadata.products = eventData.products;
-  else if (eventData.items && eventData.items[0]) {
-    mappedData.metadata.products = [];
+    const value = eventData.value || eventData['x-ga-mp1-ev'] || eventData['x-ga-mp1-tr'];
+    if (isValidValue(value)) mappedData.metadata.value = makeNumber(value);
 
-    eventData.items.forEach((product) => {
-      let item = {};
+    let items;
+    if (getType(eventData.items) === 'array' && eventData.items.length) items = eventData.items;
+    else if (
+      getType(eventData.ecommerce) === 'object' &&
+      getType(eventData.ecommerce.items) === 'array' &&
+      eventData.ecommerce.items.length
+    ) {
+      items = eventData.ecommerce.items;
+    }
 
-      if (product.item_id) item.id = makeString(product.item_id);
-      else if (product.id) item.id = makeString(product.id);
+    if (eventData.products) mappedData.metadata.products = eventData.products;
+    else if (items && items[0]) {
+      mappedData.metadata.products = [];
 
-      if (product.content_category) item.category = product.content_category;
-      else if (product.category) item.category = product.category;
-      else if (product.item_category) item.category = product.item_category;
+      items.forEach((product) => {
+        const item = {};
 
-      if (product.content_name) item.name = product.content_name;
-      else if (product.name) item.name = product.name;
-      else if (product.item_name) item.name = product.item_name;
+        const itemId = product.item_id || product.id;
+        if (itemId) item.id = makeString(itemId);
 
-      if (product.price) item.item_price = product.price;
-      else if (product.item_price) item.item_price = product.item_price;
+        const category = product.content_category || product.category || product.item_category;
+        if (category) item.category = category;
 
-      if (product.quantity) item.quantity = product.quantity;
+        const name = product.content_name || product.name || product.item_name;
+        if (name) item.name = name;
 
-      mappedData.metadata.products.push(item);
-    });
+        const price = product.price || product.item_price;
+        if (price) item.item_price = price;
+
+        if (product.quantity) item.quantity = product.quantity;
+
+        mappedData.metadata.products.push(item);
+      });
+    }
   }
 
   if (data.serverEventDataList) {
@@ -690,68 +656,75 @@ function addPropertiesData(eventData, mappedData) {
 }
 
 function addUserData(eventData, mappedData) {
-  const uuid = getUUIDFromCookie() || eventData.rdt_uuid;
-  let userEventData = {};
+  const autoMapEnabled = data.hasOwnProperty('autoMapUserData') ? data.autoMapUserData : true; // To avoid a breaking change.
 
-  if (getType(eventData.user_data) === 'object') {
-    userEventData = eventData.user_data || eventData.user_properties || eventData.user;
-  }
+  if (autoMapEnabled) {
+    let userEventData = {};
 
-  if (uuid) mappedData.user.uuid = uuid;
+    if (getType(eventData.user_data) === 'object') {
+      userEventData = eventData.user_data || eventData.user_properties || eventData.user;
+    }
 
-  const platform = eventData['x-ga-platform'];
+    const uuid = getUUIDFromCookie() || eventData._rdt_uuid || eventData.rdt_uuid;
+    if (uuid) mappedData.user.uuid = uuid;
 
-  if (eventData.aaid) mappedData.user.aaid = eventData.aaid;
-  else if (userEventData.aaid) mappedData.user.aaid = userEventData.aaid;
-  else if (platform === 'android' && eventData['x-ga-resettable_device_id']) {
-    mappedData.user.aaid = eventData['x-ga-resettable_device_id'];
-  }
+    const platform = eventData['x-ga-platform'];
 
-  if (eventData.idfa) mappedData.user.idfa = eventData.idfa;
-  else if (userEventData.idfa) mappedData.user.idfa = userEventData.idfa;
-  else if (platform === 'ios' && eventData['x-ga-resettable_device_id']) {
-    mappedData.user.idfa = eventData['x-ga-resettable_device_id'];
-  }
+    const aaid =
+      eventData.aaid ||
+      userEventData.aaid ||
+      (platform === 'android' ? eventData['x-ga-resettable_device_id'] : undefined);
+    if (aaid && aaid !== '00000000-0000-0000-0000-000000000000') mappedData.user.aaid = aaid;
 
-  if (eventData.email) mappedData.user.email = eventData.email;
-  else if (eventData.email_address) mappedData.user.email = eventData.email_address;
-  else if (userEventData.email) mappedData.user.email = userEventData.email;
-  else if (userEventData.email_address) mappedData.user.email = userEventData.email_address;
-  else if (getCookieValues('_rdt_em')[0]) mappedData.user.email = getCookieValues('_rdt_em')[0];
+    const idfa =
+      eventData.idfa ||
+      userEventData.idfa ||
+      (platform === 'ios' ? eventData['x-ga-resettable_device_id'] : undefined);
+    if (idfa && idfa !== '00000000-0000-0000-0000-000000000000') mappedData.user.idfa = idfa;
 
-  if (eventData.phone) mappedData.user.phone_number = eventData.phone;
-  else if (eventData.phone_number) mappedData.user.phone_number = eventData.phone_number;
-  else if (userEventData.phone) mappedData.user.phone_number = userEventData.phone;
-  else if (userEventData.phone_number) mappedData.user.phone_number = userEventData.phone_number;
+    const email =
+      eventData.email ||
+      eventData.email_address ||
+      userEventData.email ||
+      userEventData.email_address ||
+      getCookieValues('_rdt_em')[0];
+    if (email) mappedData.user.email = email;
 
-  if (eventData.external_id) mappedData.user.external_id = eventData.external_id;
-  else if (eventData.user_id) mappedData.user.external_id = eventData.user_id;
-  else if (eventData.userId) mappedData.user.external_id = eventData.userId;
-  else if (userEventData.external_id) mappedData.user.external_id = userEventData.external_id;
+    const phone =
+      eventData.phone ||
+      eventData.phone_number ||
+      userEventData.phone ||
+      userEventData.phone_number ||
+      getCookieValues('_rdt_ph')[0];
+    if (phone) mappedData.user.phone_number = phone;
 
-  if (eventData.ip_override) mappedData.user.ip_address = eventData.ip_override;
-  else if (eventData.ip_address) mappedData.user.ip_address = eventData.ip_address;
-  else if (eventData.ip) mappedData.user.ip_address = eventData.ip;
+    const externalId =
+      eventData.external_id || eventData.user_id || eventData.userId || userEventData.external_id;
+    if (externalId) mappedData.user.external_id = externalId;
 
-  // Retrocompatibility v2 -> v3
-  if (eventData.opt_out) {
-    mappedData.user.data_processing_options = {
-      modes: ['LDU']
-    };
-  }
+    const ip = eventData.ip_override || eventData.ip_address || eventData.ip;
+    if (ip) mappedData.user.ip_address = ip;
 
-  if (eventData.user_agent) mappedData.user.user_agent = eventData.user_agent;
+    // Retrocompatibility v2 -> v3
+    if (eventData.opt_out) {
+      mappedData.user.data_processing_options = {
+        modes: ['LDU']
+      };
+    }
 
-  if (eventData.viewport_size && eventData.viewport_size.split('x').length === 2) {
-    mappedData.user.screen_dimensions = {
-      width: makeInteger(eventData.viewport_size.split('x')[0]),
-      height: makeInteger(eventData.viewport_size.split('x')[1])
-    };
-  } else if (eventData.height && eventData.width) {
-    mappedData.user.screen_dimensions = {
-      height: makeInteger(eventData.height),
-      width: makeInteger(eventData.width)
-    };
+    if (eventData.user_agent) mappedData.user.user_agent = eventData.user_agent;
+
+    if (eventData.viewport_size && eventData.viewport_size.split('x').length === 2) {
+      mappedData.user.screen_dimensions = {
+        width: makeInteger(eventData.viewport_size.split('x')[0]),
+        height: makeInteger(eventData.viewport_size.split('x')[1])
+      };
+    } else if (eventData.height && eventData.width) {
+      mappedData.user.screen_dimensions = {
+        height: makeInteger(eventData.height),
+        width: makeInteger(eventData.width)
+      };
+    }
   }
 
   if (data.userDataList) {
@@ -759,7 +732,7 @@ function addUserData(eventData, mappedData) {
       // Retrocompatibility v2 -> v3
       if (
         (userProperty.name === 'opt_out' ||
-          userProperty.name.indexOf('data_processing_options' !== -1)) &&
+          userProperty.name.indexOf('data_processing_options') !== -1) &&
         userProperty.value
       ) {
         mappedData.user.data_processing_options = mappedData.user.data_processing_options || {
@@ -790,7 +763,7 @@ function getUUIDFromCookie() {
     if (!current) continue;
     if (!oldest || current.timestamp < oldest.timestamp) oldest = current;
   }
-  return oldest && oldest.uuid;
+  return oldest && oldest.uuid ? oldest.uuid : null;
 }
 
 function getUUIDAndTimestamp(uuidWithTimestamp) {
@@ -879,6 +852,19 @@ function getUrl(eventData) {
   return eventData.page_location || eventData.page_referrer || getRequestHeader('referer');
 }
 
+function shouldExitEarly(data, eventData) {
+  if (!isConsentGivenOrNotRequired(data, eventData)) {
+    data.gtmOnSuccess();
+    return true;
+  }
+
+  const url = getUrl(eventData);
+  if (url && url.lastIndexOf('https://gtm-msr.appspot.com/', 0) === 0) {
+    data.gtmOnSuccess();
+    return true;
+  }
+}
+
 function getCookieAutoDomain() {
   return (
     computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) ||
@@ -887,12 +873,13 @@ function getCookieAutoDomain() {
 }
 
 function enc(data) {
-  return encodeUriComponent(data || '');
+  if (['null', 'undefined'].indexOf(getType(data)) !== -1) data = '';
+  return encodeUriComponent(makeString(data));
 }
 
 function isValidValue(value) {
   const valueType = getType(value);
-  return valueType !== 'null' && valueType !== 'undefined' && value !== '';
+  return valueType !== 'null' && valueType !== 'undefined' && value !== '' && value === value;
 }
 
 function isConsentGivenOrNotRequired(data, eventData) {
@@ -900,94 +887,6 @@ function isConsentGivenOrNotRequired(data, eventData) {
   if (eventData.consent_state) return !!eventData.consent_state.ad_storage;
   const xGaGcs = eventData['x-ga-gcs'] || ''; // x-ga-gcs is a string like "G110"
   return xGaGcs[2] === '1';
-}
-
-function log(rawDataToLog) {
-  const logDestinationsHandlers = {};
-  if (determinateIsLoggingEnabled()) logDestinationsHandlers.console = logConsole;
-  if (determinateIsLoggingEnabledForBigQuery()) logDestinationsHandlers.bigQuery = logToBigQuery;
-
-  rawDataToLog.TraceId = getRequestHeader('trace-id');
-
-  const keyMappings = {
-    // No transformation for Console is needed.
-    bigQuery: {
-      Name: 'tag_name',
-      Type: 'type',
-      TraceId: 'trace_id',
-      EventName: 'event_name',
-      RequestMethod: 'request_method',
-      RequestUrl: 'request_url',
-      RequestBody: 'request_body',
-      ResponseStatusCode: 'response_status_code',
-      ResponseHeaders: 'response_headers',
-      ResponseBody: 'response_body'
-    }
-  };
-
-  for (const logDestination in logDestinationsHandlers) {
-    const handler = logDestinationsHandlers[logDestination];
-    if (!handler) continue;
-
-    const mapping = keyMappings[logDestination];
-    const dataToLog = mapping ? {} : rawDataToLog;
-
-    if (mapping) {
-      for (const key in rawDataToLog) {
-        const mappedKey = mapping[key] || key;
-        dataToLog[mappedKey] = rawDataToLog[key];
-      }
-    }
-
-    handler(dataToLog);
-  }
-}
-
-function logConsole(dataToLog) {
-  logToConsole(JSON.stringify(dataToLog));
-}
-
-function logToBigQuery(dataToLog) {
-  const connectionInfo = {
-    projectId: data.logBigQueryProjectId,
-    datasetId: data.logBigQueryDatasetId,
-    tableId: data.logBigQueryTableId
-  };
-
-  dataToLog.timestamp = getTimestampMillis();
-
-  ['request_body', 'response_headers', 'response_body'].forEach((p) => {
-    dataToLog[p] = JSON.stringify(dataToLog[p]);
-  });
-
-  BigQuery.insert(connectionInfo, [dataToLog], { ignoreUnknownValues: true });
-}
-
-function determinateIsLoggingEnabled() {
-  const containerVersion = getContainerVersion();
-  const isDebug = !!(
-    containerVersion &&
-    (containerVersion.debugMode || containerVersion.previewMode)
-  );
-
-  if (!data.logType) {
-    return isDebug;
-  }
-
-  if (data.logType === 'no') {
-    return false;
-  }
-
-  if (data.logType === 'debug') {
-    return isDebug;
-  }
-
-  return data.logType === 'always';
-}
-
-function determinateIsLoggingEnabledForBigQuery() {
-  if (data.bigQueryLogType === 'no') return false;
-  return data.bigQueryLogType === 'always';
 }
 
 function convertISOToTimeMs(dateTime) {
@@ -1077,21 +976,6 @@ ___SERVER_PERMISSIONS___
                 "mapValue": [
                   {
                     "type": 1,
-                    "string": "trace-id"
-                  }
-                ]
-              },
-              {
-                "type": 3,
-                "mapKey": [
-                  {
-                    "type": 1,
-                    "string": "headerName"
-                  }
-                ],
-                "mapValue": [
-                  {
-                    "type": 1,
                     "string": "referer"
                   }
                 ]
@@ -1168,6 +1052,10 @@ ___SERVER_PERMISSIONS___
               {
                 "type": 1,
                 "string": "_rdt_em"
+              },
+              {
+                "type": 1,
+                "string": "_rdt_ph"
               }
             ]
           }
@@ -1176,37 +1064,6 @@ ___SERVER_PERMISSIONS___
     },
     "clientAnnotations": {
       "isEditedByUser": true
-    },
-    "isRequired": true
-  },
-  {
-    "instance": {
-      "key": {
-        "publicId": "logging",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "environments",
-          "value": {
-            "type": 1,
-            "string": "all"
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
-    },
-    "isRequired": true
-  },
-  {
-    "instance": {
-      "key": {
-        "publicId": "read_container_data",
-        "versionId": "1"
-      },
-      "param": []
     },
     "isRequired": true
   },
@@ -1369,67 +1226,6 @@ ___SERVER_PERMISSIONS___
               {
                 "type": 1,
                 "string": "https://ads-api.reddit.com/"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
-    },
-    "isRequired": true
-  },
-  {
-    "instance": {
-      "key": {
-        "publicId": "access_bigquery",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "allowedTables",
-          "value": {
-            "type": 2,
-            "listItem": [
-              {
-                "type": 3,
-                "mapKey": [
-                  {
-                    "type": 1,
-                    "string": "projectId"
-                  },
-                  {
-                    "type": 1,
-                    "string": "datasetId"
-                  },
-                  {
-                    "type": 1,
-                    "string": "tableId"
-                  },
-                  {
-                    "type": 1,
-                    "string": "operation"
-                  }
-                ],
-                "mapValue": [
-                  {
-                    "type": 1,
-                    "string": "*"
-                  },
-                  {
-                    "type": 1,
-                    "string": "*"
-                  },
-                  {
-                    "type": 1,
-                    "string": "*"
-                  },
-                  {
-                    "type": 1,
-                    "string": "write"
-                  }
-                ]
               }
             ]
           }
@@ -1710,7 +1506,11 @@ setup: "const JSON = require('JSON');\nconst Promise = require('Promise');\n\nco
 
 ___NOTES___
 
-Created on 28/07/2023, 16:50:17
+2026-06-29 Change Notes:
+ - Logging removal.
 
 2026-04-27 Change Notes:
  - Fix product price key.
+
+Created on 28/07/2023, 16:50:17
+
