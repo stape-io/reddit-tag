@@ -1,6 +1,11 @@
 homepage: 'https://stape.io/'
 documentation: 'https://github.com/stape-io/reddit-tag'
 versions:
+  - sha: 703cc3c8ac83511813c79b77f11a3b3712cffc46
+    changeNotes: |2
+      BREAKING CHANGES! CAREFULLY REVIEW THE EVENT NAME SETUP OF ALL YOUR REDDIT TAGS.
+      Custom and inherited Event Names that match a Standard Event Name or a legacy v2 name (e.g. Purchase, Lead, PageVisit) are now sent as Standard Events instead of Custom Events.
+      Added support for Reddit cookies from the Data Tag common cookie object, variables in the Standard Event Name field, Order ID and Referrer URL parameters, and Click ID cookie settings.
   - sha: 9e8339bca580c8135f67b77b84f9b1616720ab8f
     changeNotes: Logging removal. Added action source, event source URL, automapping controls.
   - sha: ee2f73c8a4ed40ac0e242ba38c07968cb4f50c9f

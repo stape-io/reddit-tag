@@ -69,6 +69,7 @@ function getClickId(eventData) {
   let rdtcid =
     getCookieValues('rdt_cid')[0] /* Deprecated cookie */ ||
     getCookieValues('_rdt_cid')[0] ||
+    (eventData.common_cookie || {})._rdt_cid ||
     eventData._rdt_cid ||
     eventData.rdt_cid;
 
@@ -86,26 +87,27 @@ function getClickId(eventData) {
 function handleClickIdCookie(rdtcid) {
   const deprecatedCookie = getCookieValues('rdt_cid')[0];
   if (deprecatedCookie) {
-    setCookie('rdt_cid', '', {
-      domain: getCookieAutoDomain(),
-      path: '/',
-      samesite: 'Lax',
-      secure: true,
-      'max-age': 0,
-      httpOnly: false
-    });
+    setCookie('rdt_cid', '', getClickIdCookieOptions(0));
   }
 
-  if (rdtcid) {
-    setCookie('_rdt_cid', rdtcid, {
-      domain: getCookieAutoDomain(),
-      path: '/',
-      samesite: 'Lax',
-      secure: true,
-      'max-age': 2592000, // 30 days
-      httpOnly: false
-    });
-  }
+  const setClickIdCookieEnabled = data.hasOwnProperty('setClickIdCookie')
+    ? data.setClickIdCookie
+    : true; // To avoid a breaking change.
+  if (!setClickIdCookieEnabled || !rdtcid) return;
+
+  const cookieExpirationDays = makeInteger(data.cookieExpiration || 30);
+  setCookie('_rdt_cid', rdtcid, getClickIdCookieOptions(60 * 60 * 24 * cookieExpirationDays));
+}
+
+function getClickIdCookieOptions(maxAge) {
+  return {
+    domain: getCookieDomain(data.cookieDomain),
+    path: '/',
+    samesite: data.cookieSameSite || 'Lax',
+    secure: true,
+    'max-age': maxAge,
+    httpOnly: !!data.cookieHttpOnly
+  };
 }
 
 function mapEvent(data, eventData, rdtcid) {
@@ -137,6 +139,9 @@ function mapEvent(data, eventData, rdtcid) {
   if (mappedData.action_source === 'WEBSITE') {
     const eventSourceUrl = data.eventSourceUrl || (autoMapEnabled ? getUrl(eventData) : undefined);
     if (eventSourceUrl) mappedData.event_source_url = eventSourceUrl;
+
+    const referrerUrl = data.referrerUrl || (autoMapEnabled ? eventData.page_referrer : undefined);
+    if (referrerUrl) mappedData.referrer_url = referrerUrl;
   }
 
   mappedData = addUserData(eventData, mappedData);
@@ -158,6 +163,9 @@ function addPropertiesData(eventData, mappedData) {
   if (autoMapEnabled) {
     const eventId = eventData.event_id || eventData.transaction_id;
     if (eventId) mappedData.metadata.conversion_id = makeString(eventId);
+
+    const orderId = eventData.order_id || eventData.transaction_id;
+    if (orderId) mappedData.metadata.order_id = makeString(orderId);
 
     if (eventData.currency) mappedData.metadata.currency = eventData.currency;
     if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
@@ -206,6 +214,9 @@ function addPropertiesData(eventData, mappedData) {
       let name = serverData.name;
       let value = serverData.value;
       switch (serverData.name) {
+        case 'order_id':
+          value = makeString(value);
+          break;
         case 'value_decimal':
         case 'value':
           name = 'value'; // Retrocompatibility v2 -> v3
@@ -229,7 +240,11 @@ function addUserData(eventData, mappedData) {
       userEventData = eventData.user_data || eventData.user_properties || eventData.user;
     }
 
-    const uuid = getUUIDFromCookie() || eventData._rdt_uuid || eventData.rdt_uuid;
+    const uuid =
+      getUUIDFromCookieValues(getCookieValues('_rdt_uuid')) ||
+      getUUIDFromCookieValues([(eventData.common_cookie || {})._rdt_uuid]) ||
+      eventData._rdt_uuid ||
+      eventData.rdt_uuid;
     if (uuid) mappedData.user.uuid = uuid;
 
     const platform = eventData['x-ga-platform'];
@@ -251,7 +266,8 @@ function addUserData(eventData, mappedData) {
       eventData.email_address ||
       userEventData.email ||
       userEventData.email_address ||
-      getCookieValues('_rdt_em')[0];
+      getCookieValues('_rdt_em')[0] ||
+      (eventData.common_cookie || {})._rdt_em;
     if (email) mappedData.user.email = email;
 
     const phone =
@@ -259,7 +275,8 @@ function addUserData(eventData, mappedData) {
       eventData.phone_number ||
       userEventData.phone ||
       userEventData.phone_number ||
-      getCookieValues('_rdt_ph')[0];
+      getCookieValues('_rdt_ph')[0] ||
+      (eventData.common_cookie || {})._rdt_ph;
     if (phone) mappedData.user.phone_number = phone;
 
     const externalId =
@@ -318,8 +335,7 @@ function addUserData(eventData, mappedData) {
   return mappedData;
 }
 
-function getUUIDFromCookie() {
-  const uuidsWithTimestamps = getCookieValues('_rdt_uuid');
+function getUUIDFromCookieValues(uuidsWithTimestamps) {
   if (!uuidsWithTimestamps || !uuidsWithTimestamps.length) return null;
   let oldest = null;
   for (let i = 0; i < uuidsWithTimestamps.length; i++) {
@@ -373,38 +389,42 @@ function getEventType(eventData, data) {
       'gtm4wp.orderCompletedEEC': 'PURCHASE'
     };
 
-    if (!gaToEventName[eventName]) {
-      return {
-        tracking_type: 'CUSTOM',
-        custom_event_name: eventName
-      };
-    }
-
-    return {
-      tracking_type: gaToEventName[eventName]
-    };
+    return toEventType(gaToEventName[eventName] || eventName);
   }
 
-  if (data.eventType === 'custom') {
-    // Retrocompatibility v2 -> v3
-    const retroCompatEventNameMapping = {
-      Purchase: 'PURCHASE',
-      SignUp: 'SIGN_UP'
-    };
-    if (retroCompatEventNameMapping[data.eventNameCustom]) {
-      return {
-        tracking_type: retroCompatEventNameMapping[data.eventNameCustom]
-      };
-    }
+  return toEventType(data.eventType === 'custom' ? data.eventNameCustom : data.eventName);
+}
 
-    return {
-      tracking_type: 'CUSTOM',
-      custom_event_name: data.eventNameCustom
-    };
-  }
+function toEventType(eventName) {
+  const STANDARD_EVENT_NAMES = [
+    'PAGE_VISIT',
+    'VIEW_CONTENT',
+    'SEARCH',
+    'ADD_TO_CART',
+    'ADD_TO_WISHLIST',
+    'PURCHASE',
+    'LEAD',
+    'SIGN_UP'
+  ];
+
+  // Retrocompatibility v2 -> v3
+  const v2ToV3EventName = {
+    PageVisit: 'PAGE_VISIT',
+    ViewContent: 'VIEW_CONTENT',
+    Search: 'SEARCH',
+    AddToCart: 'ADD_TO_CART',
+    AddToWishlist: 'ADD_TO_WISHLIST',
+    Purchase: 'PURCHASE',
+    Lead: 'LEAD',
+    SignUp: 'SIGN_UP'
+  };
+  const name = v2ToV3EventName[eventName] || eventName;
+
+  if (STANDARD_EVENT_NAMES.indexOf(name) !== -1) return { tracking_type: name };
 
   return {
-    tracking_type: data.eventName
+    tracking_type: 'CUSTOM',
+    custom_event_name: name
   };
 }
 
@@ -429,11 +449,11 @@ function shouldExitEarly(data, eventData) {
   }
 }
 
-function getCookieAutoDomain() {
-  return (
-    computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) ||
-    'auto'
-  );
+function getCookieDomain(defaultCookieDomain) {
+  return !defaultCookieDomain || defaultCookieDomain === 'auto'
+    ? computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) ||
+        'auto'
+    : defaultCookieDomain;
 }
 
 function enc(data) {
@@ -443,7 +463,8 @@ function enc(data) {
 
 function isValidValue(value) {
   const valueType = getType(value);
-  return valueType !== 'null' && valueType !== 'undefined' && value !== '' && value === value;
+  if (valueType === 'null' || valueType === 'undefined' || value !== value) return false;
+  return value !== '' && value !== 'undefined' && value !== 'null';
 }
 
 function isConsentGivenOrNotRequired(data, eventData) {
