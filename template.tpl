@@ -52,39 +52,39 @@ ___TEMPLATE_PARAMETERS___
               {
                 "type": "SELECT",
                 "name": "eventName",
-                "macrosInSelect": false,
+                "macrosInSelect": true,
                 "selectItems": [
                   {
                     "value": "PAGE_VISIT",
-                    "displayValue": "Page Visit"
+                    "displayValue": "PAGE_VISIT"
                   },
                   {
                     "value": "VIEW_CONTENT",
-                    "displayValue": "View Content"
+                    "displayValue": "VIEW_CONTENT"
                   },
                   {
                     "value": "SEARCH",
-                    "displayValue": "Search"
+                    "displayValue": "SEARCH"
                   },
                   {
                     "value": "ADD_TO_CART",
-                    "displayValue": "Add To Cart"
+                    "displayValue": "ADD_TO_CART"
                   },
                   {
                     "value": "ADD_TO_WISHLIST",
-                    "displayValue": "Add To Wishlist"
+                    "displayValue": "ADD_TO_WISHLIST"
                   },
                   {
                     "value": "PURCHASE",
-                    "displayValue": "Purchase"
+                    "displayValue": "PURCHASE"
                   },
                   {
                     "value": "LEAD",
-                    "displayValue": "Lead"
+                    "displayValue": "LEAD"
                   },
                   {
                     "value": "SIGN_UP",
-                    "displayValue": "Sign Up"
+                    "displayValue": "SIGN_UP"
                   }
                 ],
                 "simpleValueType": true,
@@ -97,12 +97,14 @@ ___TEMPLATE_PARAMETERS___
                 "displayName": "Event Name",
                 "defaultValue": "PAGE_VISIT"
               }
-            ]
+            ],
+            "help": "The selected \u003ci\u003eEvent Name\u003c/i\u003e will be sent as a Standard Event.\n\u003cbr/\u003e\u003cbr/\u003e\nIf a variable is used and it resolves to a value that is not one of the Standard Event Names (e.g. \u003ci\u003ePURCHASE\u003c/i\u003e), the event will be sent as a Custom Event instead, using that resolved value as the \u003ci\u003eCustom Event Name\u003c/i\u003e."
           },
           {
             "value": "inherit",
             "subParams": [],
-            "displayValue": "Inherit from client"
+            "displayValue": "Inherit from client",
+            "help": "If the request follows the \u003cb\u003eGoogle Analytics 4 (GA4)\u003c/b\u003e schema, the following mappings will be applied to convert GA4 \u003ci\u003eEvent Names\u003c/i\u003e into the Reddit Conversions API \u003ci\u003eEvent Name\u003c/i\u003e equivalent:\n\u003cbr/\u003e\u003cbr/\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ci\u003epage_view\u003c/i\u003e, \u003ci\u003egtm.dom\u003c/i\u003e → \u003ci\u003ePAGE_VISIT\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003eview_item\u003c/i\u003e, \u003ci\u003egtm4wp.productClickEEC\u003c/i\u003e → \u003ci\u003eVIEW_CONTENT\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003esearch\u003c/i\u003e, \u003ci\u003efind_location\u003c/i\u003e → \u003ci\u003eSEARCH\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003eadd_to_cart\u003c/i\u003e, \u003ci\u003egtm4wp.addProductToCartEEC\u003c/i\u003e → \u003ci\u003eADD_TO_CART\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003eadd_to_wishlist\u003c/i\u003e → \u003ci\u003eADD_TO_WISHLIST\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003epurchase\u003c/i\u003e, \u003ci\u003egtm4wp.orderCompletedEEC\u003c/i\u003e → \u003ci\u003ePURCHASE\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003esign_up\u003c/i\u003e, \u003ci\u003ecomplete_registration\u003c/i\u003e → \u003ci\u003eSIGN_UP\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003egenerate_lead\u003c/i\u003e, \u003ci\u003ebegin_checkout\u003c/i\u003e, \u003ci\u003eadd_payment_info\u003c/i\u003e, \u003ci\u003eclick\u003c/i\u003e, \u003ci\u003edownload\u003c/i\u003e, \u003ci\u003efile_download\u003c/i\u003e, \u003ci\u003econtact\u003c/i\u003e, \u003ci\u003esubmit_application\u003c/i\u003e, \u003ci\u003esubscribe\u003c/i\u003e, \u003ci\u003egtm4wp.checkoutOptionEEC\u003c/i\u003e, \u003ci\u003egtm4wp.checkoutStepEEC\u003c/i\u003e → \u003ci\u003eLEAD\u003c/i\u003e\u003c/li\u003e\n\u003c/ul\u003e\n\u003cbr/\u003e\nAfter mapping, if the resulting event name matches a Standard Event Name, it will be sent as that Standard Event; otherwise, it will be sent as a Custom Event using that event name."
           },
           {
             "value": "custom",
@@ -119,7 +121,8 @@ ___TEMPLATE_PARAMETERS___
                 ]
               }
             ],
-            "displayValue": "Custom"
+            "displayValue": "Custom",
+            "help": "If the entered \u003ci\u003eEvent Name\u003c/i\u003e matches a Standard Event Name (\u003ci\u003ePAGE_VISIT\u003c/i\u003e, \u003ci\u003eVIEW_CONTENT\u003c/i\u003e, \u003ci\u003eSEARCH\u003c/i\u003e, \u003ci\u003eADD_TO_CART\u003c/i\u003e, \u003ci\u003eADD_TO_WISHLIST\u003c/i\u003e, \u003ci\u003ePURCHASE\u003c/i\u003e, \u003ci\u003eLEAD\u003c/i\u003e or \u003ci\u003eSIGN_UP\u003c/i\u003e), it will be sent as that Standard Event instead of a Custom Event."
           }
         ],
         "simpleValueType": true,
@@ -203,7 +206,7 @@ ___TEMPLATE_PARAMETERS___
         "name": "autoMapCommonEventData",
         "checkboxText": "Automap Common Event Data",
         "simpleValueType": true,
-        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the fields below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eEvent At:\u003c/b\u003e current server timestamp\u003c/li\u003e \u003cli\u003e\u003cb\u003eClick ID:\u003c/b\u003e \u003ci\u003erdt_cid\u003c/i\u003e URL parameter, \u003ci\u003erdt_cid\u003c/i\u003e cookie (deprecated), \u003ci\u003e_rdt_cid\u003c/i\u003e cookie, \u003ci\u003eeventData.rdt_cid\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eEvent Source URL:\u003c/b\u003e \u003ci\u003eeventData.page_location\u003c/i\u003e (Website only)\u003c/li\u003e \u003c/ul\u003e",
+        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the fields below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eEvent At:\u003c/b\u003e current server timestamp\u003c/li\u003e \u003cli\u003e\u003cb\u003eClick ID:\u003c/b\u003e \u003ci\u003erdt_cid\u003c/i\u003e URL parameter, \u003ci\u003erdt_cid\u003c/i\u003e cookie (deprecated), \u003ci\u003e_rdt_cid\u003c/i\u003e cookie, \u003ci\u003eeventData.common_cookie._rdt_cid\u003c/i\u003e, \u003ci\u003eeventData._rdt_cid\u003c/i\u003e, \u003ci\u003eeventData.rdt_cid\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eEvent Source URL:\u003c/b\u003e \u003ci\u003eeventData.page_location\u003c/i\u003e (Website only)\u003c/li\u003e \u003cli\u003e\u003cb\u003eReferrer URL:\u003c/b\u003e \u003ci\u003eeventData.page_referrer\u003c/i\u003e (Website only)\u003c/li\u003e \u003c/ul\u003e",
         "defaultValue": true
       },
       {
@@ -238,8 +241,145 @@ ___TEMPLATE_PARAMETERS___
             "type": "NOT_PRESENT"
           }
         ]
+      },
+      {
+        "type": "TEXT",
+        "name": "referrerUrl",
+        "displayName": "Referrer URL",
+        "simpleValueType": true,
+        "help": "The URL of the page that referred the user to the conversion page. (E.g. https://www.example.com/products)",
+        "enablingConditions": [
+          {
+            "paramName": "actionSource",
+            "paramValue": "WEBSITE",
+            "type": "EQUALS"
+          },
+          {
+            "paramName": "actionSource",
+            "paramValue": "",
+            "type": "NOT_PRESENT"
+          }
+        ]
       }
     ]
+  },
+  {
+    "type": "GROUP",
+    "name": "clickIdCookieSettingsGroup",
+    "displayName": "Click ID Cookie Settings",
+    "groupStyle": "ZIPPY_CLOSED",
+    "subParams": [
+      {
+        "type": "CHECKBOX",
+        "name": "setClickIdCookie",
+        "checkboxText": "Set Click ID cookie",
+        "simpleValueType": true,
+        "defaultValue": true,
+        "help": "If \u003cb\u003efalse\u003c/b\u003e, and if an existing Click ID (\u003ci\u003erdt_cid\u003c/i\u003e) is found on the sources below, it will still be sent in the request but not stored as a cookie.\n\u003cbr/\u003e\u003cbr/\u003e\nIf \u003cb\u003etrue\u003c/b\u003e, the Click ID will be sent in the request and stored as the \u003ci\u003e_rdt_cid\u003c/i\u003e cookie by server GTM.\n\u003cbr/\u003e\u003cbr/\u003e\nThe Click ID is, in this order, sourced from:\n\u003cul\u003e\n\u003cli\u003e\u003ci\u003erdt_cid\u003c/i\u003e URL query parameter\u003c/li\u003e\n\u003cli\u003e\u003ci\u003erdt_cid\u003c/i\u003e cookie (deprecated)\u003c/li\u003e\n\u003cli\u003e\u003ci\u003e_rdt_cid\u003c/i\u003e cookie\u003c/li\u003e\n\u003cli\u003e\u003ci\u003eeventData.common_cookie._rdt_cid\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003eeventData._rdt_cid\u003c/i\u003e\u003c/li\u003e\n\u003cli\u003e\u003ci\u003eeventData.rdt_cid\u003c/i\u003e\u003c/li\u003e\n\u003c/ul\u003e"
+      },
+      {
+        "type": "TEXT",
+        "name": "cookieDomain",
+        "displayName": "Cookie Domain",
+        "simpleValueType": true,
+        "valueHint": "example.com",
+        "help": "Use this option to override the domain of the \u003ci\u003e_rdt_cid\u003c/i\u003e cookie. \n\u003cbr\u003e\nEnter your website\u0027s top-level domain as a fixed value (e.g., example.com). \n\u003cbr\u003e\nIf left empty or using the \"auto\" value, the domain will be automatically determined using the following priority: \u003cul\u003e\n\u003cli\u003eDomain of the \u003ci\u003epage_location\u003c/i\u003e Event Data parameter (if present).\u003c/li\u003e\n\u003cli\u003eDomain of the \u003ci\u003eReferer\u003c/i\u003e header (if present).\u003c/li\u003e\n\u003cli\u003eDomain of the \u003ci\u003eForwarded\u003c/i\u003e header (if present).\u003c/li\u003e\n\u003cli\u003eDomain of the \u003ci\u003eX-Forwarded-Host\u003c/i\u003e header (if present).\u003c/li\u003e\n\u003cli\u003eDomain of the \u003ci\u003eHost\u003c/i\u003e header.\u003c/li\u003e\n\u003c/ul\u003e",
+        "defaultValue": "auto",
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          }
+        ],
+        "enablingConditions": [
+          {
+            "paramName": "setClickIdCookie",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ]
+      },
+      {
+        "type": "SELECT",
+        "name": "cookieSameSite",
+        "displayName": "Cookie SameSite",
+        "macrosInSelect": false,
+        "selectItems": [
+          {
+            "value": "none",
+            "displayValue": "None"
+          },
+          {
+            "value": "lax",
+            "displayValue": "Lax"
+          },
+          {
+            "value": "strict",
+            "displayValue": "Strict"
+          }
+        ],
+        "simpleValueType": true,
+        "help": "\u003ca href\u003d\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#samesitesamesite-value\" target\u003d\"_blank\"\u003eLearn more\u003c/a\u003e.",
+        "defaultValue": "lax",
+        "enablingConditions": [
+          {
+            "paramName": "setClickIdCookie",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ]
+      },
+      {
+        "type": "SELECT",
+        "name": "cookieHttpOnly",
+        "displayName": "Cookie HTTP Only Flag",
+        "macrosInSelect": false,
+        "selectItems": [
+          {
+            "value": false,
+            "displayValue": "false"
+          },
+          {
+            "value": true,
+            "displayValue": "true"
+          }
+        ],
+        "simpleValueType": true,
+        "help": "\u003ca href\u003d\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#httponly\" target\u003d\"_blank\"\u003eLearn more\u003c/a\u003e.",
+        "defaultValue": false,
+        "enablingConditions": [
+          {
+            "paramName": "setClickIdCookie",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ]
+      },
+      {
+        "type": "TEXT",
+        "name": "cookieExpiration",
+        "displayName": "Cookie Expiration",
+        "simpleValueType": true,
+        "valueUnit": "days",
+        "defaultValue": 30,
+        "help": "How long the \u003ci\u003e_rdt_cid\u003c/i\u003e cookie is kept, in days.",
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          },
+          {
+            "type": "POSITIVE_NUMBER"
+          }
+        ],
+        "enablingConditions": [
+          {
+            "paramName": "setClickIdCookie",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ]
+      }
+    ],
+    "help": "Settings for the \u003ci\u003e_rdt_cid\u003c/i\u003e cookie that the tag sets when a Click ID is found."
   },
   {
     "displayName": "Server Event Data Override",
@@ -252,7 +392,7 @@ ___TEMPLATE_PARAMETERS___
         "name": "autoMapServerEventData",
         "checkboxText": "Automap Server Event Data",
         "simpleValueType": true,
-        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the table below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eConversion ID:\u003c/b\u003e \u003ci\u003eeventData.event_id\u003c/i\u003e, \u003ci\u003eeventData.transaction_id\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eCurrency:\u003c/b\u003e \u003ci\u003eeventData.currency\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eItem Count:\u003c/b\u003e \u003ci\u003eeventData.item_count\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eValue:\u003c/b\u003e \u003ci\u003eeventData.value\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-mp1-ev\u0027]\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-mp1-tr\u0027]\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eProducts:\u003c/b\u003e \u003ci\u003eeventData.products\u003c/i\u003e, mapped from \u003ci\u003eeventData.items[]\u003c/i\u003e, \u003ci\u003eeventData.ecommerce.items[]\u003c/i\u003e\u003c/li\u003e \u003c/ul\u003e",
+        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the table below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eConversion ID:\u003c/b\u003e \u003ci\u003eeventData.event_id\u003c/i\u003e, \u003ci\u003eeventData.transaction_id\u003c/i\u003e. Used for deduplication, so it must match the \u003ci\u003econversionId\u003c/i\u003e sent by the Reddit Pixel for the same event.\u003c/li\u003e \u003cli\u003e\u003cb\u003eOrder ID:\u003c/b\u003e \u003ci\u003eeventData.order_id\u003c/i\u003e, \u003ci\u003eeventData.transaction_id\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eCurrency:\u003c/b\u003e \u003ci\u003eeventData.currency\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eItem Count:\u003c/b\u003e \u003ci\u003eeventData.item_count\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eValue:\u003c/b\u003e \u003ci\u003eeventData.value\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-mp1-ev\u0027]\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-mp1-tr\u0027]\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eProducts:\u003c/b\u003e \u003ci\u003eeventData.products\u003c/i\u003e, mapped from \u003ci\u003eeventData.items[]\u003c/i\u003e, \u003ci\u003eeventData.ecommerce.items[]\u003c/i\u003e\u003c/li\u003e \u003c/ul\u003e",
         "defaultValue": true
       },
       {
@@ -273,6 +413,10 @@ ___TEMPLATE_PARAMETERS___
               {
                 "value": "conversion_id",
                 "displayValue": "Conversion ID"
+              },
+              {
+                "value": "order_id",
+                "displayValue": "Order ID"
               },
               {
                 "value": "currency",
@@ -305,7 +449,7 @@ ___TEMPLATE_PARAMETERS___
         ],
         "type": "SIMPLE_TABLE",
         "newRowButtonText": "Add property",
-        "help": "Make sure your input is formatted accordingly to the \u003ca href\u003d\"https://ads-api.reddit.com/docs/v3/operations/Post%20Conversion%20Events\"\u003e Official Documentation\u003c/a\u003e.\n\u003cbr/\u003e\n\u003cul\u003e \n\u003cli\u003e\u003cb\u003eConversion ID (string): \u003c/b\u003eThe unique conversion ID that corresponds to a distinct conversion event. (E.g. \u0027OID12345\u0027)\u003c/li\u003e\n \u003cli\u003e\u003cb\u003eCurrency (string): Three-character ISO 4217 code. \u003c/b\u003e (E.g. \u0027\u0027USD\u0027,\u0027CAD\u0027,etc)\u003c/li\u003e\n \u003cli\u003e\u003cb\u003eItem Count (integer): The number of items in the event. \u003c/b\u003e (E.g. 5)\u003c/li\u003e \n\u003cli\u003e\u003cb\u003eValue (number/double): \u003c/b\u003e The value of the transaction.\u003c/br\u003e (E.g. \u0027123.99\u0027)\u003c/li\u003e \n\u003cli\u003e\u003cb\u003eProducts (product[]): \u003c/b\u003e Array of product objects.\u003c/br\u003e (E.g. \u0027[ {category:\"food utensils\", id:\"ABC123\", name: \"large pasta bowl\" }, ... ]\u0027)\u003c/li\u003e \n\u003c/ul\u003e",
+        "help": "Make sure your input is formatted according to the \u003ca href\u003d\"https://ads-api.reddit.com/docs/v3/api/post-conversion-events\" target\u003d\"_blank\"\u003eofficial documentation\u003c/a\u003e.\n\u003cbr/\u003e\n\u003cul\u003e\n\u003cli\u003e\u003cb\u003eConversion ID (string):\u003c/b\u003e the unique ID of a distinct conversion event. It is used for \u003ca href\u003d\"https://business.reddithelp.com/s/article/event-deduplication\" target\u003d\"_blank\"\u003ededuplication\u003c/a\u003e: if the same event is sent more than once with the same Conversion ID, it is processed only once. To deduplicate against events sent by the Reddit Pixel, use the same value as the Pixel\u0027s \u003ci\u003econversionId\u003c/i\u003e. Deduplication applies only to events with the same Action Source. (E.g. \u0027H72B9A4YXQ\u0027)\u003c/li\u003e\n\u003cli\u003e\u003cb\u003eOrder ID (string):\u003c/b\u003e the advertiser-assigned order identifier for the transaction. Values longer than 100 characters are truncated. (E.g. \u0027order-123\u0027)\u003c/li\u003e\n\u003cli\u003e\u003cb\u003eCurrency (string):\u003c/b\u003e three-letter ISO 4217 code. (E.g. \u0027USD\u0027)\u003c/li\u003e\n\u003cli\u003e\u003cb\u003eItem Count (integer):\u003c/b\u003e the number of items in the event. (E.g. 5)\u003c/li\u003e\n\u003cli\u003e\u003cb\u003eProducts (product[]):\u003c/b\u003e array of product objects. (E.g. [{ \"id\": \"item-213\", \"category\": \"Food Items\", \"name\": \"Carne Asada Burrito\", \"quantity\": 1, \"item_price\": 10.99 }])\u003c/li\u003e\n\u003cli\u003e\u003cb\u003eValue (number):\u003c/b\u003e the transaction\u0027s value in the base unit of the currency. (E.g. 10.99)\u003c/li\u003e\n\u003c/ul\u003e",
         "displayName": "Help"
       }
     ]
@@ -321,7 +465,7 @@ ___TEMPLATE_PARAMETERS___
         "name": "autoMapUserData",
         "checkboxText": "Automap User Data",
         "simpleValueType": true,
-        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the table below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eEmail:\u003c/b\u003e \u003ci\u003eeventData.email\u003c/i\u003e, \u003ci\u003eeventData.email_address\u003c/i\u003e, \u003ci\u003eeventData.user_data.email\u003c/i\u003e, \u003ci\u003eeventData.user_data.email_address\u003c/i\u003e, \u003ci\u003e_rdt_em\u003c/i\u003e cookie\u003c/li\u003e \u003cli\u003e\u003cb\u003ePhone Number:\u003c/b\u003e \u003ci\u003eeventData.phone\u003c/i\u003e, \u003ci\u003eeventData.phone_number\u003c/i\u003e, \u003ci\u003eeventData.user_data.phone\u003c/i\u003e, \u003ci\u003eeventData.user_data.phone_number\u003c/i\u003e, \u003ci\u003e_rdt_ph\u003c/i\u003e cookie\u003c/li\u003e \u003cli\u003e\u003cb\u003eExternal ID:\u003c/b\u003e \u003ci\u003eeventData.external_id\u003c/i\u003e, \u003ci\u003eeventData.user_id\u003c/i\u003e, \u003ci\u003eeventData.userId\u003c/i\u003e, \u003ci\u003eeventData.user_data.external_id\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eIP Address:\u003c/b\u003e \u003ci\u003eeventData.ip_override\u003c/i\u003e, \u003ci\u003eeventData.ip_address\u003c/i\u003e, \u003ci\u003eeventData.ip\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eUser Agent:\u003c/b\u003e \u003ci\u003eeventData.user_agent\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eScreen Dimensions:\u003c/b\u003e \u003ci\u003eeventData.viewport_size\u003c/i\u003e (WxH format), \u003ci\u003eeventData.width\u003c/i\u003e + \u003ci\u003eeventData.height\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eUUID (_rdt_uuid first party cookie):\u003c/b\u003e \u003ci\u003e_rdt_uuid\u003c/i\u003e cookie, \u003ci\u003eeventData.rdt_uuid\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eAndroid GAID/AAID:\u003c/b\u003e \u003ci\u003eeventData.aaid\u003c/i\u003e, \u003ci\u003eeventData.user_data.aaid\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-resettable_device_id\u0027]\u003c/i\u003e (Android) — null UUIDs are ignored\u003c/li\u003e \u003cli\u003e\u003cb\u003eiOS IDFA:\u003c/b\u003e \u003ci\u003eeventData.idfa\u003c/i\u003e, \u003ci\u003eeventData.user_data.idfa\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-resettable_device_id\u0027]\u003c/i\u003e (iOS) — null UUIDs are ignored\u003c/li\u003e \u003c/ul\u003e",
+        "help": "If enabled, the tag will attempt to automatically map parameters from your event data. \u003cbr/\u003e\u003cbr/\u003e Any value you manually enter in the table below will always override the auto-mapped value. \u003cbr/\u003e\u003cbr/\u003e Default mappings: \u003cul\u003e \u003cli\u003e\u003cb\u003eEmail:\u003c/b\u003e \u003ci\u003eeventData.email\u003c/i\u003e, \u003ci\u003eeventData.email_address\u003c/i\u003e, \u003ci\u003eeventData.user_data.email\u003c/i\u003e, \u003ci\u003eeventData.user_data.email_address\u003c/i\u003e, \u003ci\u003e_rdt_em\u003c/i\u003e cookie, \u003ci\u003eeventData.common_cookie._rdt_em\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003ePhone Number:\u003c/b\u003e \u003ci\u003eeventData.phone\u003c/i\u003e, \u003ci\u003eeventData.phone_number\u003c/i\u003e, \u003ci\u003eeventData.user_data.phone\u003c/i\u003e, \u003ci\u003eeventData.user_data.phone_number\u003c/i\u003e, \u003ci\u003e_rdt_ph\u003c/i\u003e cookie, \u003ci\u003eeventData.common_cookie._rdt_ph\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eExternal ID:\u003c/b\u003e \u003ci\u003eeventData.external_id\u003c/i\u003e, \u003ci\u003eeventData.user_id\u003c/i\u003e, \u003ci\u003eeventData.userId\u003c/i\u003e, \u003ci\u003eeventData.user_data.external_id\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eIP Address:\u003c/b\u003e \u003ci\u003eeventData.ip_override\u003c/i\u003e, \u003ci\u003eeventData.ip_address\u003c/i\u003e, \u003ci\u003eeventData.ip\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eUser Agent:\u003c/b\u003e \u003ci\u003eeventData.user_agent\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eScreen Dimensions:\u003c/b\u003e \u003ci\u003eeventData.viewport_size\u003c/i\u003e (WxH format), \u003ci\u003eeventData.width\u003c/i\u003e + \u003ci\u003eeventData.height\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eUUID (_rdt_uuid first party cookie):\u003c/b\u003e \u003ci\u003e_rdt_uuid\u003c/i\u003e cookie, \u003ci\u003eeventData.common_cookie._rdt_uuid\u003c/i\u003e, \u003ci\u003eeventData._rdt_uuid\u003c/i\u003e, \u003ci\u003eeventData.rdt_uuid\u003c/i\u003e\u003c/li\u003e \u003cli\u003e\u003cb\u003eAndroid GAID/AAID:\u003c/b\u003e \u003ci\u003eeventData.aaid\u003c/i\u003e, \u003ci\u003eeventData.user_data.aaid\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-resettable_device_id\u0027]\u003c/i\u003e (Android) — null UUIDs are ignored\u003c/li\u003e \u003cli\u003e\u003cb\u003eiOS IDFA:\u003c/b\u003e \u003ci\u003eeventData.idfa\u003c/i\u003e, \u003ci\u003eeventData.user_data.idfa\u003c/i\u003e, \u003ci\u003eeventData[\u0027x-ga-resettable_device_id\u0027]\u003c/i\u003e (iOS) — null UUIDs are ignored\u003c/li\u003e \u003c/ul\u003e",
         "defaultValue": true
       },
       {
@@ -505,6 +649,7 @@ function getClickId(eventData) {
   let rdtcid =
     getCookieValues('rdt_cid')[0] /* Deprecated cookie */ ||
     getCookieValues('_rdt_cid')[0] ||
+    (eventData.common_cookie || {})._rdt_cid ||
     eventData._rdt_cid ||
     eventData.rdt_cid;
 
@@ -522,26 +667,27 @@ function getClickId(eventData) {
 function handleClickIdCookie(rdtcid) {
   const deprecatedCookie = getCookieValues('rdt_cid')[0];
   if (deprecatedCookie) {
-    setCookie('rdt_cid', '', {
-      domain: getCookieAutoDomain(),
-      path: '/',
-      samesite: 'Lax',
-      secure: true,
-      'max-age': 0,
-      httpOnly: false
-    });
+    setCookie('rdt_cid', '', getClickIdCookieOptions(0));
   }
 
-  if (rdtcid) {
-    setCookie('_rdt_cid', rdtcid, {
-      domain: getCookieAutoDomain(),
-      path: '/',
-      samesite: 'Lax',
-      secure: true,
-      'max-age': 2592000, // 30 days
-      httpOnly: false
-    });
-  }
+  const setClickIdCookieEnabled = data.hasOwnProperty('setClickIdCookie')
+    ? data.setClickIdCookie
+    : true; // To avoid a breaking change.
+  if (!setClickIdCookieEnabled || !rdtcid) return;
+
+  const cookieExpirationDays = makeInteger(data.cookieExpiration || 30);
+  setCookie('_rdt_cid', rdtcid, getClickIdCookieOptions(60 * 60 * 24 * cookieExpirationDays));
+}
+
+function getClickIdCookieOptions(maxAge) {
+  return {
+    domain: getCookieDomain(data.cookieDomain),
+    path: '/',
+    samesite: data.cookieSameSite || 'Lax',
+    secure: true,
+    'max-age': maxAge,
+    httpOnly: !!data.cookieHttpOnly
+  };
 }
 
 function mapEvent(data, eventData, rdtcid) {
@@ -573,6 +719,9 @@ function mapEvent(data, eventData, rdtcid) {
   if (mappedData.action_source === 'WEBSITE') {
     const eventSourceUrl = data.eventSourceUrl || (autoMapEnabled ? getUrl(eventData) : undefined);
     if (eventSourceUrl) mappedData.event_source_url = eventSourceUrl;
+
+    const referrerUrl = data.referrerUrl || (autoMapEnabled ? eventData.page_referrer : undefined);
+    if (referrerUrl) mappedData.referrer_url = referrerUrl;
   }
 
   mappedData = addUserData(eventData, mappedData);
@@ -594,6 +743,9 @@ function addPropertiesData(eventData, mappedData) {
   if (autoMapEnabled) {
     const eventId = eventData.event_id || eventData.transaction_id;
     if (eventId) mappedData.metadata.conversion_id = makeString(eventId);
+
+    const orderId = eventData.order_id || eventData.transaction_id;
+    if (orderId) mappedData.metadata.order_id = makeString(orderId);
 
     if (eventData.currency) mappedData.metadata.currency = eventData.currency;
     if (eventData.item_count) mappedData.metadata.item_count = eventData.item_count;
@@ -642,6 +794,9 @@ function addPropertiesData(eventData, mappedData) {
       let name = serverData.name;
       let value = serverData.value;
       switch (serverData.name) {
+        case 'order_id':
+          value = makeString(value);
+          break;
         case 'value_decimal':
         case 'value':
           name = 'value'; // Retrocompatibility v2 -> v3
@@ -665,7 +820,11 @@ function addUserData(eventData, mappedData) {
       userEventData = eventData.user_data || eventData.user_properties || eventData.user;
     }
 
-    const uuid = getUUIDFromCookie() || eventData._rdt_uuid || eventData.rdt_uuid;
+    const uuid =
+      getUUIDFromCookieValues(getCookieValues('_rdt_uuid')) ||
+      getUUIDFromCookieValues([(eventData.common_cookie || {})._rdt_uuid]) ||
+      eventData._rdt_uuid ||
+      eventData.rdt_uuid;
     if (uuid) mappedData.user.uuid = uuid;
 
     const platform = eventData['x-ga-platform'];
@@ -687,7 +846,8 @@ function addUserData(eventData, mappedData) {
       eventData.email_address ||
       userEventData.email ||
       userEventData.email_address ||
-      getCookieValues('_rdt_em')[0];
+      getCookieValues('_rdt_em')[0] ||
+      (eventData.common_cookie || {})._rdt_em;
     if (email) mappedData.user.email = email;
 
     const phone =
@@ -695,7 +855,8 @@ function addUserData(eventData, mappedData) {
       eventData.phone_number ||
       userEventData.phone ||
       userEventData.phone_number ||
-      getCookieValues('_rdt_ph')[0];
+      getCookieValues('_rdt_ph')[0] ||
+      (eventData.common_cookie || {})._rdt_ph;
     if (phone) mappedData.user.phone_number = phone;
 
     const externalId =
@@ -754,8 +915,7 @@ function addUserData(eventData, mappedData) {
   return mappedData;
 }
 
-function getUUIDFromCookie() {
-  const uuidsWithTimestamps = getCookieValues('_rdt_uuid');
+function getUUIDFromCookieValues(uuidsWithTimestamps) {
   if (!uuidsWithTimestamps || !uuidsWithTimestamps.length) return null;
   let oldest = null;
   for (let i = 0; i < uuidsWithTimestamps.length; i++) {
@@ -809,38 +969,42 @@ function getEventType(eventData, data) {
       'gtm4wp.orderCompletedEEC': 'PURCHASE'
     };
 
-    if (!gaToEventName[eventName]) {
-      return {
-        tracking_type: 'CUSTOM',
-        custom_event_name: eventName
-      };
-    }
-
-    return {
-      tracking_type: gaToEventName[eventName]
-    };
+    return toEventType(gaToEventName[eventName] || eventName);
   }
 
-  if (data.eventType === 'custom') {
-    // Retrocompatibility v2 -> v3
-    const retroCompatEventNameMapping = {
-      Purchase: 'PURCHASE',
-      SignUp: 'SIGN_UP'
-    };
-    if (retroCompatEventNameMapping[data.eventNameCustom]) {
-      return {
-        tracking_type: retroCompatEventNameMapping[data.eventNameCustom]
-      };
-    }
+  return toEventType(data.eventType === 'custom' ? data.eventNameCustom : data.eventName);
+}
 
-    return {
-      tracking_type: 'CUSTOM',
-      custom_event_name: data.eventNameCustom
-    };
-  }
+function toEventType(eventName) {
+  const STANDARD_EVENT_NAMES = [
+    'PAGE_VISIT',
+    'VIEW_CONTENT',
+    'SEARCH',
+    'ADD_TO_CART',
+    'ADD_TO_WISHLIST',
+    'PURCHASE',
+    'LEAD',
+    'SIGN_UP'
+  ];
+
+  // Retrocompatibility v2 -> v3
+  const v2ToV3EventName = {
+    PageVisit: 'PAGE_VISIT',
+    ViewContent: 'VIEW_CONTENT',
+    Search: 'SEARCH',
+    AddToCart: 'ADD_TO_CART',
+    AddToWishlist: 'ADD_TO_WISHLIST',
+    Purchase: 'PURCHASE',
+    Lead: 'LEAD',
+    SignUp: 'SIGN_UP'
+  };
+  const name = v2ToV3EventName[eventName] || eventName;
+
+  if (STANDARD_EVENT_NAMES.indexOf(name) !== -1) return { tracking_type: name };
 
   return {
-    tracking_type: data.eventName
+    tracking_type: 'CUSTOM',
+    custom_event_name: name
   };
 }
 
@@ -865,11 +1029,11 @@ function shouldExitEarly(data, eventData) {
   }
 }
 
-function getCookieAutoDomain() {
-  return (
-    computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) ||
-    'auto'
-  );
+function getCookieDomain(defaultCookieDomain) {
+  return !defaultCookieDomain || defaultCookieDomain === 'auto'
+    ? computeEffectiveTldPlusOne(getEventData('page_location') || getRequestHeader('referer')) ||
+        'auto'
+    : defaultCookieDomain;
 }
 
 function enc(data) {
@@ -879,7 +1043,8 @@ function enc(data) {
 
 function isValidValue(value) {
   const valueType = getType(value);
-  return valueType !== 'null' && valueType !== 'undefined' && value !== '' && value === value;
+  if (valueType === 'null' || valueType === 'undefined' || value !== value) return false;
+  return value !== '' && value !== 'undefined' && value !== 'null';
 }
 
 function isConsentGivenOrNotRequired(data, eventData) {
@@ -1491,20 +1656,426 @@ scenarios:
 
     assertApi('gtmOnSuccess').wasCalled();
     assertApi('gtmOnFailure').wasNotCalled();
-setup: "const JSON = require('JSON');\nconst Promise = require('Promise');\n\nconst\
-  \ EXPECTED_PIXEL_ID = 'expectedPixelId';\nconst EXPECTED_ACCESS_TOKEN = 'expectedAccessToken';\n\
-  const EXPECTED_API_VERSION = '3';\nconst EXPECTED_API_URL = 'https://ads-api.reddit.com/api/v'\
-  \ + EXPECTED_API_VERSION + '/pixels/' + EXPECTED_PIXEL_ID + '/conversion_events';\n\
-  \nconst mockData = {\n  accountId: EXPECTED_PIXEL_ID,\n  accessToken: EXPECTED_ACCESS_TOKEN\n\
-  };\n\nmock('sendHttpRequest', (requestUrl, callback, requestOptions, requestBody)\
-  \ => {\n  if (typeof callback === 'function') {\n    callback(200);\n  } else {\n\
-  \    requestBody = requestOptions;\n    requestOptions = callback;\n    return Promise.create((resolve,\
-  \ reject) => {\n      resolve({ statusCode: 200 });\n    });  \n  }\n});\n\nmock('getRequestHeader',\
-  \ (header) => {\n  if (header === 'trace-id') return 'expectedTraceId';\n});\n\n\
-  mock('getTimestampMillis', 1747945830456);"
+- name: '[Event Name] Standard mode sends each selected standard event as tracking_type'
+  code: |-
+    const sentEvents = captureSentEvents();
+    const standardEventNames = ['PAGE_VISIT', 'VIEW_CONTENT', 'SEARCH', 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'PURCHASE', 'LEAD', 'SIGN_UP'];
+
+    standardEventNames.forEach((eventName) => {
+      runCode(createMockData({ eventType: 'standard', eventName: eventName }));
+    });
+
+    assertThat(sentEvents.length).isEqualTo(standardEventNames.length);
+    standardEventNames.forEach((eventName, index) => {
+      assertThat(sentEvents[index].type).isEqualTo({ tracking_type: eventName });
+    });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Event Name] Standard mode sends a Custom event when a variable resolves to a non-standard name'
+  code: |-
+    const sentEvents = captureSentEvents();
+
+    runCode(createMockData({ eventType: 'standard', eventName: 'my_variable_event' }));
+
+    assertThat(sentEvents[0].type).isEqualTo({ tracking_type: 'CUSTOM', custom_event_name: 'my_variable_event' });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Event Name] Standard and Custom modes convert legacy v2 event names to v3 standard events'
+  code: |-
+    const sentEvents = captureSentEvents();
+    const scenarios = [
+      { v2: 'PageVisit', v3: 'PAGE_VISIT' },
+      { v2: 'ViewContent', v3: 'VIEW_CONTENT' },
+      { v2: 'Search', v3: 'SEARCH' },
+      { v2: 'AddToCart', v3: 'ADD_TO_CART' },
+      { v2: 'AddToWishlist', v3: 'ADD_TO_WISHLIST' },
+      { v2: 'Purchase', v3: 'PURCHASE' },
+      { v2: 'Lead', v3: 'LEAD' },
+      { v2: 'SignUp', v3: 'SIGN_UP' }
+    ];
+
+    scenarios.forEach((scenario) => {
+      runCode(createMockData({ eventType: 'standard', eventName: scenario.v2 }));
+      runCode(createMockData({ eventType: 'custom', eventNameCustom: scenario.v2 }));
+    });
+
+    assertThat(sentEvents.length).isEqualTo(scenarios.length * 2);
+    scenarios.forEach((scenario, index) => {
+      assertThat(sentEvents[index * 2].type).isEqualTo({ tracking_type: scenario.v3 });
+      assertThat(sentEvents[index * 2 + 1].type).isEqualTo({ tracking_type: scenario.v3 });
+    });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Event Name] Custom mode sends CUSTOM tracking_type with custom_event_name'
+  code: |-
+    const sentEvents = captureSentEvents();
+
+    runCode(createMockData({ eventType: 'custom', eventNameCustom: 'my_custom_event' }));
+
+    assertThat(sentEvents[0].type).isEqualTo({ tracking_type: 'CUSTOM', custom_event_name: 'my_custom_event' });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Event Name] Custom mode sends a standard event when the name matches a standard event name'
+  code: |-
+    const sentEvents = captureSentEvents();
+
+    runCode(createMockData({ eventType: 'custom', eventNameCustom: 'PURCHASE' }));
+    runCode(createMockData({ eventType: 'custom', eventNameCustom: 'ADD_TO_CART' }));
+    runCode(createMockData({ eventType: 'custom', eventNameCustom: 'purchase' }));
+
+    assertThat(sentEvents[0].type).isEqualTo({ tracking_type: 'PURCHASE' });
+    assertThat(sentEvents[1].type).isEqualTo({ tracking_type: 'ADD_TO_CART' });
+    assertThat(sentEvents[2].type).isEqualTo({ tracking_type: 'CUSTOM', custom_event_name: 'purchase' });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Event Name] Inherit mode maps GA4 event names, passes standard names through and sends the rest as Custom'
+  code: |-
+    const sentEvents = captureSentEvents();
+    const scenarios = [
+      { eventName: 'page_view', expected: { tracking_type: 'PAGE_VISIT' } },
+      { eventName: 'view_item', expected: { tracking_type: 'VIEW_CONTENT' } },
+      { eventName: 'search', expected: { tracking_type: 'SEARCH' } },
+      { eventName: 'add_to_cart', expected: { tracking_type: 'ADD_TO_CART' } },
+      { eventName: 'add_to_wishlist', expected: { tracking_type: 'ADD_TO_WISHLIST' } },
+      { eventName: 'purchase', expected: { tracking_type: 'PURCHASE' } },
+      { eventName: 'generate_lead', expected: { tracking_type: 'LEAD' } },
+      { eventName: 'sign_up', expected: { tracking_type: 'SIGN_UP' } },
+      { eventName: 'gtm4wp.orderCompletedEEC', expected: { tracking_type: 'PURCHASE' } },
+      { eventName: 'SIGN_UP', expected: { tracking_type: 'SIGN_UP' } },
+      { eventName: 'unknown_ga4_event', expected: { tracking_type: 'CUSTOM', custom_event_name: 'unknown_ga4_event' } }
+    ];
+
+    scenarios.forEach((scenario) => {
+      mock('getAllEventData', { event_name: scenario.eventName });
+      runCode(createMockData({ eventType: 'inherit' }));
+    });
+
+    assertThat(sentEvents.length).isEqualTo(scenarios.length);
+    scenarios.forEach((scenario, index) => {
+      assertThat(sentEvents[index].type).isEqualTo(scenario.expected);
+    });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Common Cookie] Click ID, UUID, email and phone are read from eventData common_cookie'
+  code: |-
+    const sentEvents = captureSentEvents();
+    mock('computeEffectiveTldPlusOne', 'example.com');
+    mock('getAllEventData', {
+      common_cookie: {
+        _rdt_cid: 'commonCookieClickId',
+        _rdt_uuid: '1747945830000.commonCookieUuid',
+        _rdt_em: 'commonCookieEmail',
+        _rdt_ph: 'commonCookiePhone'
+      },
+      _rdt_cid: 'eventDataClickId',
+      rdt_cid: 'eventDataClickIdNoPrefix',
+      _rdt_uuid: 'eventDataUuid',
+      rdt_uuid: 'eventDataUuidNoPrefix'
+    });
+
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT' }));
+
+    assertThat(sentEvents[0].click_id).isEqualTo('commonCookieClickId');
+    assertThat(sentEvents[0].user.uuid).isEqualTo('commonCookieUuid');
+    assertThat(sentEvents[0].user.email).isEqualTo('commonCookieEmail');
+    assertThat(sentEvents[0].user.phone_number).isEqualTo('commonCookiePhone');
+    assertApi('setCookie').wasCalledWith('_rdt_cid', 'commonCookieClickId', {
+      domain: 'example.com',
+      path: '/',
+      samesite: 'Lax',
+      secure: true,
+      'max-age': 2592000,
+      httpOnly: false
+    });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Common Cookie] Cookies take priority over common_cookie, and common_cookie over other Event Data keys'
+  code: |-
+    const sentEvents = captureSentEvents();
+    const commonCookie = {
+      _rdt_cid: 'commonCookieClickId',
+      _rdt_uuid: '1747945830000.commonCookieUuid',
+      _rdt_em: 'commonCookieEmail',
+      _rdt_ph: 'commonCookiePhone'
+    };
+
+    mock('getAllEventData', { common_cookie: commonCookie });
+    mock('getCookieValues', (cookieName) => {
+      const cookies = {
+        _rdt_cid: ['cookieClickId'],
+        _rdt_uuid: ['1747945830000.cookieUuid'],
+        _rdt_em: ['cookieEmail'],
+        _rdt_ph: ['cookiePhone']
+      };
+      return cookies[cookieName] || [];
+    });
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT' }));
+
+    mock('getCookieValues', []);
+    mock('getAllEventData', {
+      common_cookie: commonCookie,
+      _rdt_cid: 'eventDataClickId',
+      _rdt_uuid: 'eventDataUuid',
+      email: 'eventDataEmail',
+      phone: 'eventDataPhone'
+    });
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT' }));
+
+    mock('getAllEventData', { common_cookie: { _rdt_uuid: 'invalidUuidFormat' }, _rdt_uuid: 'eventDataUuid' });
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT' }));
+
+    assertThat(sentEvents[0].click_id).isEqualTo('cookieClickId');
+    assertThat(sentEvents[0].user.uuid).isEqualTo('cookieUuid');
+    assertThat(sentEvents[0].user.email).isEqualTo('cookieEmail');
+    assertThat(sentEvents[0].user.phone_number).isEqualTo('cookiePhone');
+
+    assertThat(sentEvents[1].click_id).isEqualTo('commonCookieClickId');
+    assertThat(sentEvents[1].user.uuid).isEqualTo('commonCookieUuid');
+    assertThat(sentEvents[1].user.email).isEqualTo('eventDataEmail');
+    assertThat(sentEvents[1].user.phone_number).isEqualTo('eventDataPhone');
+
+    assertThat(sentEvents[2].user.uuid).isEqualTo('eventDataUuid');
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Common Cookie] Values are not read from common_cookie when User Data auto-mapping is disabled'
+  code: |-
+    const sentEvents = captureSentEvents();
+    mock('getAllEventData', {
+      common_cookie: { _rdt_uuid: '1747945830000.commonCookieUuid', _rdt_em: 'commonCookieEmail', _rdt_ph: 'commonCookiePhone' }
+    });
+
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT', autoMapUserData: false }));
+
+    assertThat(sentEvents[0].user).isEqualTo({});
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Value] Is only sent when the Event Data value is valid'
+  code: |-
+    const sentEvents = captureSentEvents();
+    const scenarios = [
+      { value: undefined, isSent: false },
+      { value: null, isSent: false },
+      { value: '', isSent: false },
+      { value: 'undefined', isSent: false },
+      { value: 'null', isSent: false },
+      { value: '0', isSent: true, expected: 0 },
+      { value: '19.99', isSent: true, expected: 19.99 },
+      { value: 19.99, isSent: true, expected: 19.99 }
+    ];
+
+    scenarios.forEach((scenario) => {
+      mock('getAllEventData', { value: scenario.value });
+      runCode(createMockData({ eventType: 'standard', eventName: 'PURCHASE' }));
+    });
+
+    scenarios.forEach((scenario, index) => {
+      if (scenario.isSent) assertThat(sentEvents[index].metadata.value).isEqualTo(scenario.expected);
+      else assertThat(sentEvents[index].metadata.value).isUndefined();
+    });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Click ID Cookie] Uses the Cookie Domain, SameSite, HTTP Only and Expiration settings from the UI'
+  code: |-
+    captureSentEvents();
+    mock('getCookieValues', (cookieName) => {
+      if (cookieName === 'rdt_cid') return ['deprecatedClickId'];
+      return [];
+    });
+
+    runCode(createMockData({
+      eventType: 'standard',
+      eventName: 'PAGE_VISIT',
+      cookieDomain: 'example.org',
+      cookieSameSite: 'strict',
+      cookieHttpOnly: true,
+      cookieExpiration: '7'
+    }));
+
+    assertApi('setCookie').wasCalledWith('_rdt_cid', 'deprecatedClickId', {
+      domain: 'example.org',
+      path: '/',
+      samesite: 'strict',
+      secure: true,
+      'max-age': 604800,
+      httpOnly: true
+    });
+    assertApi('setCookie').wasCalledWith('rdt_cid', '', {
+      domain: 'example.org',
+      path: '/',
+      samesite: 'strict',
+      secure: true,
+      'max-age': 0,
+      httpOnly: true
+    });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Click ID Cookie] Uses the automatic domain and default settings when the UI settings are not set'
+  code: |-
+    captureSentEvents();
+    mock('computeEffectiveTldPlusOne', 'example.com');
+    mock('getCookieValues', (cookieName) => {
+      if (cookieName === 'rdt_cid') return ['deprecatedClickId'];
+      return [];
+    });
+
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT' }));
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT', cookieDomain: 'auto' }));
+
+    assertApi('setCookie').wasCalledWith('_rdt_cid', 'deprecatedClickId', {
+      domain: 'example.com',
+      path: '/',
+      samesite: 'Lax',
+      secure: true,
+      'max-age': 2592000,
+      httpOnly: false
+    });
+    assertApi('setCookie').wasCalledWith('rdt_cid', '', {
+      domain: 'example.com',
+      path: '/',
+      samesite: 'Lax',
+      secure: true,
+      'max-age': 0,
+      httpOnly: false
+    });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Click ID Cookie] Is only set when Set Click ID cookie is enabled or missing, and the Click ID is always sent'
+  code: |-
+    const sentEvents = captureSentEvents();
+    mock('getAllEventData', { page_location: 'https://example.com/?rdt_cid=urlClickId' });
+
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT', setClickIdCookie: false }));
+    assertApi('setCookie').wasNotCalled();
+
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT', setClickIdCookie: true }));
+    runCode(createMockData({ eventType: 'standard', eventName: 'PAGE_VISIT' }));
+
+    assertThat(sentEvents.length).isEqualTo(3);
+    sentEvents.forEach((sentEvent) => {
+      assertThat(sentEvent.click_id).isEqualTo('urlClickId');
+    });
+    assertApi('setCookie').wasCalledWith('_rdt_cid', 'urlClickId', {
+      domain: 'auto',
+      path: '/',
+      samesite: 'Lax',
+      secure: true,
+      'max-age': 2592000,
+      httpOnly: false
+    });
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Order ID and Referrer URL] Are auto-mapped from Event Data'
+  code: |-
+    const sentEvents = captureSentEvents();
+
+    mock('getAllEventData', { order_id: 'order-123', transaction_id: 'T-456', page_referrer: 'https://www.example.com/products' });
+    runCode(createMockData({ eventType: 'standard', eventName: 'PURCHASE' }));
+
+    mock('getAllEventData', { transaction_id: 456 });
+    runCode(createMockData({ eventType: 'standard', eventName: 'PURCHASE' }));
+
+    assertThat(sentEvents[0].metadata.order_id).isEqualTo('order-123');
+    assertThat(sentEvents[0].referrer_url).isEqualTo('https://www.example.com/products');
+    assertThat(sentEvents[0].metadata.referrer_url).isUndefined();
+
+    assertThat(sentEvents[1].metadata.order_id).isEqualTo('456');
+    assertThat(sentEvents[1].referrer_url).isUndefined();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Order ID and Referrer URL] Manual values override auto-mapping'
+  code: |-
+    const sentEvents = captureSentEvents();
+    mock('getAllEventData', { order_id: 'order-123', page_referrer: 'https://www.example.com/products' });
+
+    runCode(createMockData({
+      eventType: 'standard',
+      eventName: 'PURCHASE',
+      referrerUrl: 'https://manual.example.com/',
+      serverEventDataList: [{ name: 'order_id', value: 789 }]
+    }));
+
+    assertThat(sentEvents[0].metadata.order_id).isEqualTo('789');
+    assertThat(sentEvents[0].referrer_url).isEqualTo('https://manual.example.com/');
+    assertThat(sentEvents[0].metadata.referrer_url).isUndefined();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Order ID and Referrer URL] Not sent when auto-mapping is disabled, and Referrer URL only sent for Website events'
+  code: |-
+    const sentEvents = captureSentEvents();
+    mock('getAllEventData', { order_id: 'order-123', page_referrer: 'https://www.example.com/products' });
+
+    runCode(createMockData({ eventType: 'standard', eventName: 'PURCHASE', autoMapServerEventData: false }));
+    runCode(createMockData({ eventType: 'standard', eventName: 'PURCHASE', autoMapCommonEventData: false }));
+    runCode(createMockData({ eventType: 'standard', eventName: 'PURCHASE', actionSource: 'APP', referrerUrl: 'https://manual.example.com/' }));
+
+    assertThat(sentEvents[0].metadata.order_id).isUndefined();
+    assertThat(sentEvents[0].referrer_url).isEqualTo('https://www.example.com/products');
+    assertThat(sentEvents[1].metadata.order_id).isEqualTo('order-123');
+    assertThat(sentEvents[1].referrer_url).isUndefined();
+    assertThat(sentEvents[2].referrer_url).isUndefined();
+    assertThat(sentEvents[2].event_source_url).isUndefined();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+setup: |-
+  const JSON = require('JSON');
+  const Promise = require('Promise');
+  const getType = require('getType');
+
+  const EXPECTED_PIXEL_ID = 'expectedPixelId';
+  const EXPECTED_ACCESS_TOKEN = 'expectedAccessToken';
+  const EXPECTED_API_VERSION = '3';
+  const EXPECTED_API_URL = 'https://ads-api.reddit.com/api/v' + EXPECTED_API_VERSION + '/pixels/' + EXPECTED_PIXEL_ID + '/conversion_events';
+
+  const mockData = {
+    accountId: EXPECTED_PIXEL_ID,
+    accessToken: EXPECTED_ACCESS_TOKEN
+  };
+
+  const createMockData = (overrides) => {
+    const copyMockData = {
+      accountId: EXPECTED_PIXEL_ID,
+      accessToken: EXPECTED_ACCESS_TOKEN
+    };
+    for (const key in overrides) copyMockData[key] = overrides[key];
+    return copyMockData;
+  };
+
+  const captureSentEvents = () => {
+    const sentEvents = [];
+    mock('sendHttpRequest', (requestUrl, callback, requestOptions, requestBody) => {
+      sentEvents.push(JSON.parse(requestBody).data.events[0]);
+      callback(200);
+    });
+    return sentEvents;
+  };
+
+  mock('sendHttpRequest', (requestUrl, callback, requestOptions, requestBody) => {
+    if (getType(callback) === 'function') {
+      callback(200);
+    } else {
+      requestBody = requestOptions;
+      requestOptions = callback;
+      return Promise.create((resolve, reject) => {
+        resolve({ statusCode: 200 });
+      });
+    }
+  });
+
+  mock('getRequestHeader', (header) => {
+    if (header === 'trace-id') return 'expectedTraceId';
+  });
+
+  mock('getTimestampMillis', 1747945830456);
 
 
 ___NOTES___
+
+2026-11-16 - Change Notes:
+  - BREAKING CHANGE: Custom and inherited Event Names that match a Standard Event Name (e.g. `PURCHASE`) or a legacy v2 name (e.g. `Purchase`, `Lead`, `PageVisit`) are now sent as that Standard Event instead of a Custom Event; review the Event Name setup of your Reddit tags
+  - Broaden the Event Name setup: variables are accepted in the Standard field (non-standard values are sent as Custom Events), and the drop-down shows the API names (e.g. `PAGE_VISIT`), with help texts for each option
+  - Add Order ID (`metadata.order_id`) to Server Event Data, auto-mapped from `order_id`/`transaction_id`, and a Referrer URL field below Event Source URL (Website only, like Event Source URL), auto-mapped from `page_referrer`; explain in the help texts that Conversion ID is used for deduplication
+  - Read Reddit's `_rdt_cid`, `_rdt_uuid`, `_rdt_em` and `_rdt_ph` values from the Data Tag's `common_cookie` Event Data object (after the cookies, before other Event Data keys), and add Click ID Cookie Settings for `_rdt_cid`: a Set Click ID cookie checkbox (on by default, and treated as on for existing tags), plus domain, SameSite, HTTP Only and expiration, with the domain override following the other Stape templates' `getCookieDomain`
+  - Treat the strings `'undefined'` and `'null'` as invalid values, so they are no longer sent as the conversion value; add unit tests for event names, common cookies, cookie settings, the new Server Event Data fields and value validation
 
 2026-06-29 Change Notes:
  - Logging removal.
